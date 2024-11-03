@@ -71,6 +71,54 @@ class MaterialType(str, Enum):
     SHATTER_MAP = "sollumz_material_shard"
 
 
+class TextureUsage(str, Enum):
+    UNKNOWN = "sollumz_unknown"
+    TINTPALETTE = "sollumz_tintpalette"
+    DEFAULT = "sollumz_default"
+    TERRAIN = "sollumz_terrain"
+    CLOUDDENSITY = "sollumz_clouddensity"
+    CLOUDNORMAL = "sollumz_cloudnormal"
+    CABLE = "sollumz_cable"
+    FENCE = "sollumz_fence"
+    ENVEFFECT = "sollumz_env.effect"
+    SCRIPT = "sollumz_script"
+    WATERFLOW = "sollumz_waterflow"
+    WATERFOAM = "sollumz_waterfoam"
+    WATERFOG = "sollumz_waterfog"
+    WATEROCEAN = "sollumz_waterocean"
+    WATER = "sollumz_water"
+    FOAMOPACITY = "sollumz_foamopacity"
+    FOAM = "sollumz_foam"
+    DIFFUSEDETAIL = "sollumz_diffusedetail"
+    DIFFUSEDARK = "sollumz_diffusedark"
+    DIFFUSEALPHAOPAQUE = "sollumz_diffuseaplhaopaque"
+    DETAIL = "sollumz_detail"
+    NORMAL = "sollumz_normal"
+    SPECULAR = "sollumz_specular"
+    EMISSIVE = "sollumz_emissive"
+    SKIPPROCESSING = "sollumz_skipprocessing"
+    DONTOPTIMIZE = "sollumz_dontoptimize"
+    TEST = "sollumz_test"
+    COUNT = "sollumz_count"
+    DIFFUSE = "sollumz_diffuse"
+
+
+class TextureFormat(str, Enum):
+    DXT1 = "sollumz_dxt1"
+    DXT3 = "sollumz_dxt3"
+    DXT5 = "sollumz_dxt5"
+    ATI1 = "sollumz_ati1"
+    ATI2 = "sollumz_ati2"
+    BC7 = "sollumz_bc7"
+    A1R5G5B5 = "sollumz_a1r5g5b5"
+    A1R8G8B8 = "sollumz_a1r8g8b8"
+    A8R8G8B8 = "sollumz_a8r8g8b8"
+    A8B8G8R8 = "sollumz_a8b8g8r8"
+    X8R8G8B8 = "sollumz_x8r8g8b8"
+    A8 = "sollumz_a8"
+    L8 = "sollumz_l8"
+
+
 class LODLevel(str, Enum):
     VERYHIGH = "sollumz_veryhigh"
     HIGH = "sollumz_high"
@@ -105,11 +153,18 @@ class EntityPriorityLevel(str, Enum):
     PRI_OPTIONAL_LOW = "sollumz_pri_optional_low"
 
 
+class YmapElementType(str, Enum):
+    ENTITY = "sollumz_element_entity"
+    MODEL_OCCLUDER = "sollumz_element_modeloccluder"
+    BOX_OCCLUDER = "sollumz_element_boxoccluder"
+    CAR_GENERATOR = "sollumz_element_cargenerator"
+
+
 class ArchetypeType(str, Enum):
     BASE = "sollumz_archetype_base"
     TIME = "sollumz_archetype_time"
     MLO = "sollumz_archetype_mlo"
-
+    
 
 class AssetType(str, Enum):
     UNITIALIZED = "sollumz_asset_unintialized"
@@ -260,6 +315,50 @@ SOLLUMZ_UI_NAMES = {
     MaterialType.COLLISION: "Sollumz Collision Material",
     MaterialType.SHATTER_MAP: "Sollumz Shatter Map",
 
+    TextureUsage.UNKNOWN: "UNKNOWN",
+    TextureUsage.TINTPALETTE: "TINTPALETTE",
+    TextureUsage.DEFAULT: "DEFAULT",
+    TextureUsage.TERRAIN: "TERRAIN",
+    TextureUsage.CLOUDDENSITY: "CLOUDDENSITY",
+    TextureUsage.CLOUDNORMAL: "CLOUDNORMAL",
+    TextureUsage.CABLE: "CABLE",
+    TextureUsage.FENCE: "FENCE",
+    TextureUsage.ENVEFFECT: "ENV.EFFECT",
+    TextureUsage.SCRIPT: "SCRIPT",
+    TextureUsage.WATERFLOW: "WATERFLOW",
+    TextureUsage.WATERFOAM: "WATERFOAM",
+    TextureUsage.WATERFOG: "WATERFOG",
+    TextureUsage.WATEROCEAN: "WATEROCEAN",
+    TextureUsage.WATER: "WATER",
+    TextureUsage.FOAMOPACITY: "FOAMOPACITY",
+    TextureUsage.FOAM: "FOAM",
+    TextureUsage.DIFFUSEDETAIL: "DIFFUSEDETAIL",
+    TextureUsage.DIFFUSEDARK: "DIFFUSEDARK",
+    TextureUsage.DIFFUSEALPHAOPAQUE: "DIFFUSEALPHAOPAQUE",
+    TextureUsage.DETAIL: "DETAIL",
+    TextureUsage.NORMAL: "NORMAL",
+    TextureUsage.SPECULAR: "SPECULAR",
+    TextureUsage.EMISSIVE: "EMISSIVE",
+    TextureUsage.SKIPPROCESSING: "SKIPPROCESSING",
+    TextureUsage.DONTOPTIMIZE: "DONTOPTIMIZE",
+    TextureUsage.TEST: "TEST",
+    TextureUsage.COUNT: "COUNT",
+    TextureUsage.DIFFUSE: "DIFFUSE",
+
+    TextureFormat.DXT1: "D3DFMT_DXT1",
+    TextureFormat.DXT3: "D3DFMT_DXT3",
+    TextureFormat.DXT5: "D3DFMT_DXT5",
+    TextureFormat.ATI1: "D3DFMT_ATI1",
+    TextureFormat.ATI2: "D3DFMT_ATI2",
+    TextureFormat.BC7: "D3DFMT_BC7",
+    TextureFormat.A1R5G5B5: "D3DFMT_A1R5G5B5",
+    TextureFormat.A1R8G8B8: "D3DFMT_A1R8G8B8",
+    TextureFormat.A8R8G8B8: "D3DFMT_A8R8G8B8",
+    TextureFormat.A8B8G8R8: "D3DFMT_A8B8G8R8",
+    TextureFormat.X8R8G8B8: "D3DFMT_X8R8G8B8",
+    TextureFormat.A8: "D3DFMT_A8",
+    TextureFormat.L8: "D3DFMT_L8",
+
     LODLevel.VERYHIGH: "Very High",
     LODLevel.HIGH: "High",
     LODLevel.MEDIUM: "Medium",
@@ -287,6 +386,11 @@ SOLLUMZ_UI_NAMES = {
     ArchetypeType.BASE: "Base",
     ArchetypeType.TIME: "Time",
     ArchetypeType.MLO: "MLO",
+
+    YmapElementType.ENTITY: "Entities",
+    YmapElementType.MODEL_OCCLUDER: "Model Occluders",
+    YmapElementType.BOX_OCCLUDER: "Box Occluders",
+    YmapElementType.CAR_GENERATOR: "Car Generators",
 
     AssetType.UNITIALIZED: "Uninitialized",
     AssetType.FRAGMENT: "Fragment",
