@@ -17,6 +17,7 @@ from .cwxml.navmesh import YNV
 from .cwxml.clipdictionary import YCD
 from .cwxml.ytyp import YTYP
 from .cwxml.ymap import YMAP
+from .cwxml.nodepath import YND
 from .ydr.ydrimport import import_ydr
 from .ydr.ydrexport import export_ydr
 from .ydd.yddimport import import_ydd
@@ -28,6 +29,7 @@ from .ybn.ybnexport import export_ybn
 from .ynv.ynvimport import import_ynv
 from .ycd.ycdimport import import_ycd
 from .ycd.ycdexport import export_ycd
+from .ynd.yndimport import import_ynd
 from .ymap.ymapimport import import_ymap
 from .ymap.ymapexport import export_ymap
 from .ytyp.ytypimport import import_ytyp
@@ -107,6 +109,8 @@ class SOLLUMZ_OT_import_assets(bpy.types.Operator, ImportHelper, TimedOperator):
                         import_ynv(filepath)
                     elif YCD.file_extension in filepath:
                         import_ycd(filepath)
+                    elif YND.file_extension in filepath:
+                        import_ynd(filepath)
                     elif YMAP.file_extension in filepath:
                         import_ymap(filepath)
                     else:
