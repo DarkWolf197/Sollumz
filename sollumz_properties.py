@@ -56,6 +56,8 @@ class SollumType(str, Enum):
     YMAP_MODEL_OCCLUDER = "sollumz_ymap_model_occluder"
     YMAP_CAR_GENERATOR = "sollumz_ymap_car_generator"
 
+    NODE_DICTIONARY = "sollumz_node_dictionary"
+    TRAFFIC_NODE = "sollumz_traffic_node"
 
 class LightType(str, Enum):
     NONE = "sollumz_light_none"
@@ -239,6 +241,9 @@ SOLLUMZ_UI_NAMES = {
     SollumType.NAVMESH_POLY_MESH: "NavMesh Poly Mesh",
     SollumType.NAVMESH_PORTAL: "NavMesh Portal",
     SollumType.NAVMESH_POINT: "NavMesh Point",
+
+    SollumType.NODE_DICTIONARY: "Node Dictionary",
+    SollumType.TRAFFIC_NODE: "Traffic Node",
 
     SollumType.CLIP_DICTIONARY: "Clip Dictionary",
     SollumType.CLIPS: "Clips",

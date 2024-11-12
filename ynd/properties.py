@@ -1,13 +1,6 @@
 import bpy
-from bpy.props import (FloatProperty, CollectionProperty, PointerProperty,
+from bpy.props import (FloatProperty, CollectionProperty, PointerProperty, BoolProperty,
                        StringProperty, IntProperty, FloatVectorProperty)
-
-
-class JunctionRefProperties(bpy.types.PropertyGroup):
-    area_id: IntProperty("AreaID")
-    node_id: IntProperty("NodeID")
-    junction_id: IntProperty("JunctionID")
-    unk_0: IntProperty("Unk0")
 
 
 class JunctionProperties(bpy.types.PropertyGroup):
@@ -17,6 +10,13 @@ class JunctionProperties(bpy.types.PropertyGroup):
     size_x: IntProperty(name="Size X")
     size_y: IntProperty(name="Size Y")
     heightmap: StringProperty(name="Heightmap", default="")
+
+
+class JunctionRefProperties(bpy.types.PropertyGroup):
+    area_id: IntProperty("AreaID")
+    node_id: IntProperty("NodeID")
+    junction_id: IntProperty("JunctionID")
+    unk_0: IntProperty("Unk0")
 
 
 class LinkProperties(bpy.types.PropertyGroup):
@@ -40,14 +40,17 @@ class NodeProperties(bpy.types.PropertyGroup):
     flags_4: IntProperty(name="Flags 4")
     flags_5: IntProperty(name="Flags 5")
     links: CollectionProperty(type=LinkProperties)
-
+    junction_found: BoolProperty(name="Junction Found", default=False)
+    junctionref: PointerProperty(type=JunctionRefProperties)
+    junction: PointerProperty(type=JunctionProperties)
 
 class NodePathProperties(bpy.types.PropertyGroup):
     vehicle_node_count: IntProperty("VehicleNodeCount")
     ped_node_count: IntProperty("PedNodeCount")
     nodes: CollectionProperty(type=NodeProperties)
     junctions: CollectionProperty(type=JunctionProperties)
-    junctionrefs: CollectionProperty(type=JunctionRefProperties)
+    
+    
 
 
 def register():

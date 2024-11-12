@@ -30,6 +30,7 @@ from .ynv.ynvimport import import_ynv
 from .ycd.ycdimport import import_ycd
 from .ycd.ycdexport import export_ycd
 from .ynd.yndimport import import_ynd
+from .ynd.yndexport import export_ynd
 from .ymap.ymapimport import import_ymap
 from .ymap.ymapexport import export_ymap
 from .ytyp.ytypimport import import_ytyp
@@ -72,7 +73,7 @@ class SOLLUMZ_OT_import_assets(bpy.types.Operator, ImportHelper, TimedOperator):
     )
 
     filter_glob: bpy.props.StringProperty(
-        default="".join(f"*{filetype.file_extension};" for filetype in (YDR, YDD, YFT, YBN, YNV, YCD, YMAP, YTYP)),
+        default="".join(f"*{filetype.file_extension};" for filetype in (YDR, YDD, YFT, YBN, YNV, YND, YCD, YMAP, YTYP)),
         options={"HIDDEN", "SKIP_SAVE"},
         maxlen=255,
     )
@@ -242,6 +243,9 @@ class SOLLUMZ_OT_export_assets(bpy.types.Operator, TimedOperator):
                     elif obj.sollum_type == SollumType.CLIP_DICTIONARY:
                         filepath = self.get_filepath(obj, YCD.file_extension)
                         success = export_ycd(obj, filepath)
+                    elif obj.sollum_type == SollumType.NODE_DICTIONARY:
+                        filepath = self.get_filepath(obj, YND.file_extension)
+                        success = export_ynd(obj, filepath)
                     elif obj.sollum_type in BOUND_TYPES:
                         filepath = self.get_filepath(obj, YBN.file_extension)
                         success = export_ybn(obj, filepath)
@@ -446,12 +450,12 @@ class ClearTimeFlags(SOLLUMZ_OT_base):
 
 def sollumz_menu_func_import(self, context):
     self.layout.operator(SOLLUMZ_OT_import_assets.bl_idname,
-                         text=f"CodeWalker XML({YDR.file_extension}, {YDD.file_extension}, {YFT.file_extension}, {YBN.file_extension}, {YCD.file_extension})")
+                         text=f"CodeWalker XML({YDR.file_extension}, {YDD.file_extension}, {YFT.file_extension}, {YBN.file_extension}, {YCD.file_extension}, {YND.file_extension})")
 
 
 def sollumz_menu_func_export(self, context):
     self.layout.operator(SOLLUMZ_OT_export_assets.bl_idname,
-                         text=f"CodeWalker XML({YDR.file_extension}, {YDD.file_extension}, {YFT.file_extension}, {YBN.file_extension}, {YCD.file_extension})")
+                         text=f"CodeWalker XML({YDR.file_extension}, {YDD.file_extension}, {YFT.file_extension}, {YBN.file_extension}, {YCD.file_extension}, {YND.file_extension})")
 
 
 class SOLLUMZ_OT_debug_hierarchy(bpy.types.Operator):
