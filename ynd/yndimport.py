@@ -25,6 +25,8 @@ def apply_node_properties(obj, node):
         modifier.node_group = bpy.data.node_groups["StreetGeoNode"]
         modifier.name = f"Link {i + 1}"
         modifier["Socket_1"] = find_node(link_obj.to_area_id, link_obj.to_node_id)
+        modifier["Socket_2"] = bpy.data.materials["Green Link"]
+        modifier["Socket_3"] = 2
 
 
 def apply_link_properties(obj, link):
@@ -54,8 +56,10 @@ def apply_junction_properties(obj, junction):
 def node_to_obj(parent_obj: bpy.types.Object, node):
     mesh = bpy.data.meshes.new("Node")
     node_obj = bpy.data.objects.new("PathNode", mesh)
-    
     node_obj.sollum_type = SollumType.TRAFFIC_NODE
+    node_obj.lock_rotation = (True, True, True)
+    node_obj.lock_scale = (True, True, True)
+    
 
     create_box(mesh, size=0.5)
 

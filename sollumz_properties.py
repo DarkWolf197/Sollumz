@@ -121,6 +121,19 @@ class AssetType(str, Enum):
     ASSETLESS = "sollumz_asset_assetless"
 
 
+#class NodeSpecialType(str, Enum):
+#    NONE = "sollumz_node_none"
+#    PARKING = "sollumz_node_parking_space"
+#    PED_CROSSING = "sollumz_node_ped_crossing"
+#    PED_ASSISTED = "sollumz_node_ped_assisted"
+#    TRAFFIC_LIGHT = "sollumz_node_traffic_light"
+#    STOP_SIGN = "sollumz_node_stop_sign"
+#    CAUTION = "sollumz_node_caution"
+#    PED_CROSSING_NOWAIT = "sollumz_node_ped_crossing_nowait"
+#    EMERGENCY_VEHICLES = "sollumz_node_emergency_vehicles"
+#    OFFROAD_JUNCTION = "sollumz_node_offroad_junction"
+    
+
 class VehicleLightID(str, Enum):
     NONE = "none"
     ALWAYS_ON = "0"
@@ -298,6 +311,17 @@ SOLLUMZ_UI_NAMES = {
     AssetType.DRAWABLE: "Drawable",
     AssetType.DRAWABLE_DICTIONARY: "Drawable Dictionary",
     AssetType.ASSETLESS: "Assetless",
+
+    #NodeSpecialType.NONE: "None",
+    #NodeSpecialType.PARKING: "Parking Space",
+    #NodeSpecialType.PED_CROSSING: "PedNodeRoadCrossing",
+    #NodeSpecialType.PED_ASSISTED: "PedNodeAssistedMovement",
+    #NodeSpecialType.TRAFFIC_LIGHT: "TrafficLightJunctionStop",
+    #NodeSpecialType.STOP_SIGN: "Stop Sign",
+    #NodeSpecialType.CAUTION: "Caution",
+    #NodeSpecialType.PED_CROSSING_NOWAIT: "PedRoadCrossingNoWait",
+    #NodeSpecialType.EMERGENCY_VEHICLES: "EmergencyVehiclesOnly",
+    #NodeSpecialType.OFFROAD_JUNCTION: "OffRoadJunction",
 
     VehicleLightID.NONE: "None",
     VehicleLightID.CUSTOM: "Custom",
