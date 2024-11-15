@@ -83,7 +83,7 @@ class NodeFlags(FlagPropertyGroup, bpy.types.PropertyGroup):
         name="Left Turn Only")
     
     # Flags5
-    has_heightmap: bpy.props.BoolProperty(
+    has_junction: bpy.props.BoolProperty(
         name="Has Heightmap")
     speed: bpy.props.EnumProperty(
         items=speeds, name="Speed")

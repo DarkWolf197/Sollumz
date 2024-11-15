@@ -5,7 +5,8 @@ from .flags import NodeFlags, LinkFlags
 from .geonode import UpdateGeonode
 
 class JunctionProperties(bpy.types.PropertyGroup):
-    position: FloatVectorProperty(name="Position", default=(0, 0, 0), size=3, subtype='XYZ')
+    position_x: FloatProperty(name="Pos X")
+    position_y: FloatProperty(name="Pos Y")
     min_z: FloatProperty(name="Min Z")
     max_z: FloatProperty(name="Max Z")
     size_x: IntProperty(name="Size X")

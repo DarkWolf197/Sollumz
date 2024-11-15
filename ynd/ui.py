@@ -53,6 +53,7 @@ class YndToolChildPanel:
 class SOLLUMZ_PT_NODE_FLAGS_PANEL(YndToolChildPanel, FlagsPanel, bpy.types.Panel):
     bl_idname = "SOLLUMZ_PT_NODE_FLAGS_PANEL"
     icon = "BOOKMARKS"
+    bl_order = 0
 
     @classmethod
     def poll(self, context):
@@ -68,6 +69,7 @@ class SOLLUMZ_PT_NODE_LINKS_PANEL(YndToolChildPanel, TabbedPanelHelper, bpy.type
     bl_label = "Links"
     bl_idname = "SOLLUMZ_PT_NODE_LINKS_PANEL"
     bl_options = {"DEFAULT_CLOSED"}
+    bl_order = 1
 
     @classmethod
     def poll(self, context):
@@ -76,19 +78,23 @@ class SOLLUMZ_PT_NODE_LINKS_PANEL(YndToolChildPanel, TabbedPanelHelper, bpy.type
 
     def draw(self, context):
         layout = self.layout
+        active_node = context.active_object.node_properties
 
         draw_list_with_add_remove(layout, "sollumz.createlink", "sollumz.deletelink",
-            SOLLUMZ_UL_LINKS_LIST.bl_idname, "", context.view_layer.objects.active.node_properties, "links", context.view_layer.objects.active.node_properties, "link_index")
-
-
+            SOLLUMZ_UL_LINKS_LIST.bl_idname, "", active_node, "links", active_node, "link_index")
+        
+        layout.prop(active_node.links[active_node.link_index], "to_area_id")
+        layout.prop(active_node.links[active_node.link_index], "to_node_id")
+        layout.prop(active_node.links[active_node.link_index], "length")
 
 class NodeLinksChildTabPanel(TabPanel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_parent_id = SOLLUMZ_PT_NODE_LINKS_PANEL.bl_idname
     bl_category = SOLLUMZ_PT_NODE_LINKS_PANEL.bl_category
-
+    
     parent_tab_panel = SOLLUMZ_PT_NODE_LINKS_PANEL
+
 
 class SOLLUMZ_PT_LINK_FLAGS_PANEL(NodeLinksChildTabPanel, FlagsPanel, bpy.types.Panel):
     bl_idname = "SOLLUMZ_PT_LINK_FLAGS_PANEL"
@@ -100,5 +106,37 @@ class SOLLUMZ_PT_LINK_FLAGS_PANEL(NodeLinksChildTabPanel, FlagsPanel, bpy.types.
         return aobj is not None and aobj.sollum_type == SollumType.TRAFFIC_NODE
 
     def get_flags(self, context):
+        active_node = context.active_object.node_properties
+        return get_list_item(active_node.links, active_node.link_index).flags
+    
+
+class SOLLUMZ_PT_JUNCTIONS_PANEL(YndToolChildPanel, bpy.types.Panel):
+    bl_label = "Junctions"
+    bl_idname = "SOLLUMZ_PT_JUNCTIONS_PANEL"
+    bl_options = {"DEFAULT_CLOSED"}
+    bl_order = 2
+
+    @classmethod
+    def poll(self, context):
         aobj = context.active_object
-        return get_list_item(aobj.node_properties.links, aobj.node_properties.link_index).flags
+
+        return (aobj is not None and aobj.sollum_type == SollumType.TRAFFIC_NODE) and aobj.node_properties.flags.has_junction
+
+    def draw(self, context):
+        layout = self.layout
+        active_node = context.active_object.node_properties
+        box = layout.box()
+
+        box.prop(active_node.junctionref, "area_id")
+        box.prop(active_node.junctionref, "node_id")
+        box.prop(active_node.junctionref, "junction_id")
+        box.prop(active_node.junctionref, "unk_0")
+        
+        box = layout.box()
+        box.prop(active_node.junction, "position_x")
+        box.prop(active_node.junction, "position_y")
+        box.prop(active_node.junction, "min_z")
+        box.prop(active_node.junction, "max_z")
+        box.prop(active_node.junction, "size_x")
+        box.prop(active_node.junction, "size_y")
+        box.prop(active_node.junction, "heightmap")
