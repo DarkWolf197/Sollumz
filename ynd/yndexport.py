@@ -17,68 +17,77 @@ special_types = {
 speed_levels = ['SLOW', 'NORMAL', 'FAST', 'FASTER']
 
 def get_node_flags(obj):
+
     flags0 = 0
-    flags0 |= obj.fill_group_1 << 0
-    flags0 |= obj.fill_group_2 << 1
-    flags0 |= obj.fill_group_3 << 2
-    flags0 |= obj.offroad << 3
-    flags0 |= obj.unused_4 << 4
-    flags0 |= obj.nobigvehicles << 5
-    flags0 |= obj.nogoright << 6
-    flags0 |= obj.nogoleft << 7
+    if obj.fill_group_1:                flags0 |= (1 << 0)
+    if obj.fill_group_2:                flags0 |= (1 << 1)
+    if obj.fill_group_3:                flags0 |= (1 << 2)
+    if obj.offroad:                     flags0 |= (1 << 3)
+    if obj.unused_4:                    flags0 |= (1 << 4)
+    if obj.nobigvehicles:               flags0 |= (1 << 5)
+    if obj.nogoright:                   flags0 |= (1 << 6)
+    if obj.nogoleft:                    flags0 |= (1 << 7)
 
-    flags1 = 0
-    flags1 |= obj.slip_lane << 0
-    flags1 |= obj.indicate_keep_left << 1
-    flags1 |= obj.indicate_keep_right << 2
-    flags1 |= list(special_types.keys())[list(special_types.values()).index(obj.special_type)]
-
+    flags1 = 0  
+    if obj.slip_lane:                   flags1 |= (1 << 0)
+    if obj.indicate_keep_left:          flags1 |= (1 << 1)
+    if obj.indicate_keep_right:         flags1 |= (1 << 2)
+    
+    for flag_value, type_name in special_types.items():
+        if type_name == obj.special_type:
+            flags1 |= flag_value
+            break
+    
     flags2 = 0
-    flags2 |= obj.no_gps << 0
-    flags2 |= obj.unused_5 << 1
-    flags2 |= obj.junction << 2
-    flags2 |= obj.unused_6 << 3
-    flags2 |= obj.switched_off_original << 4
-    flags2 |= obj.water_node << 5
-    flags2 |= obj.highway_bridge << 6
-    flags2 |= obj.switched_off << 7
+    if obj.no_gps:                      flags2 |= (1 << 0)
+    if obj.unused_5:                    flags2 |= (1 << 1)
+    if obj.junction:                    flags2 |= (1 << 2)
+    if obj.unused_6:                    flags2 |= (1 << 3)
+    if obj.switched_off_original:       flags2 |= (1 << 4)
+    if obj.water_node:                  flags2 |= (1 << 5)
+    if obj.highway_bridge:              flags2 |= (1 << 6)
+    if obj.switched_off:                flags2 |= (1 << 7)
 
     flags3 = 0
-    flags3 |= obj.tunnel
-    flags3 |= obj.heuretic * 2
+    if obj.tunnel:                      flags3 |= (1 << 0)
+    flags3 |= (obj.heuretic & 127) << 1
 
     flags4 = 0
-    flags4 |= obj.density & 0xF
-    flags4 |= (obj.deadness & 0xF) << 4
-    flags4 |= obj.left_turn_only << 7
+    flags4 |= obj.density & 15
+    flags4 |= (obj.deadness & 7) << 4
+    if obj.left_turn_only:              flags4 |= (1 << 7)
 
     flags5 = 0
-    flags5 |= obj.has_junction << 0
-    flags5 |= speed_levels.index(obj.speed) << 1
+    if obj.has_junction:                flags5 |= (1 << 0)
+    for speed_index, speed_value in enumerate(speed_levels):
+        if speed_value == obj.speed:
+            flags5 |= speed_index << 1
+            break
 
     return flags0, flags1, flags2, flags3, flags4, flags5
 
 
 def get_link_flags(obj):
+
     flags0 = 0
-    flags0 |= obj.gps_both_ways << 0
-    flags0 |= obj.block_if_no_lanes << 1
-    flags0 |= obj.tilt << 2
-    flags0 |= obj.tilt_falloff << 5
+    if obj.gps_both_ways:           flags0 |= (1 << 0)
+    if obj.block_if_no_lanes:       flags0 |= (1 << 1)
+    flags0 |=                       (obj.tilt & 7) << 2
+    flags0 |=                       (obj.tilt_falloff & 7) << 5
 
     flags1 = 0
-    flags1 |= obj.tilt_falloff_2 << 0
-    flags1 |= obj.narrow_road << 1
-    flags1 |= obj.leads_to_dead_end << 2
-    flags1 |= obj.leads_from_dead_end << 3
-    flags1 |= obj.negative_offset << 7
-    flags1 |= obj.width << 4
+    if obj.tilt_falloff_2:          flags1 |= (1 << 0)
+    if obj.narrow_road:             flags1 |= (1 << 1)
+    if obj.leads_to_dead_end:       flags1 |= (1 << 2)
+    if obj.leads_from_dead_end:     flags1 |= (1 << 3)
+    if obj.negative_offset:         flags1 |= (1 << 7)
+    flags1 |=                       (obj.offset & 7) << 4
 
     flags2 = 0
-    flags2 |= obj.dont_use_for_navigation << 0
-    flags2 |= obj.shortcut << 1
-    flags2 |= obj.bwd_lanes << 2
-    flags2 |= obj.fwd_lanes << 5
+    if obj.dont_use_for_navigation: flags2 |= (1 << 0)
+    if obj.shortcut:                flags2 |= (1 << 1)
+    flags2 |=                       (obj.bwd_lanes & 7) << 2
+    flags2 |=                       (obj.fwd_lanes & 7) << 5
 
     return flags0, flags1, flags2
 

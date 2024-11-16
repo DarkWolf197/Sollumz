@@ -8,7 +8,6 @@ from ..tools.utils import get_filename
 
 
 special_types = {
-    0: 'NONE',
     16: 'PARKING',
     80: 'PED_CROSSING',
     112: 'PED_ASSISTED',
@@ -21,59 +20,59 @@ special_types = {
 
 speed_levels = ['SLOW', 'NORMAL', 'FAST', 'FASTER']
 
-
 def set_node_flags(obj, flags0, flags1, flags2, flags3, flags4, flags5):
-    obj.node_properties.flags.fill_group_1 = bool(flags0 & (1 << 0))
-    obj.node_properties.flags.fill_group_2 = bool(flags0 & (1 << 1))
-    obj.node_properties.flags.fill_group_3 = bool(flags0 & (1 << 2))
-    obj.node_properties.flags.offroad = bool(flags0 & (1 << 3))
-    obj.node_properties.flags.unused_4 = bool(flags0 & (1 << 4))
-    obj.node_properties.flags.nobigvehicles = bool(flags0 & (1 << 5))
-    obj.node_properties.flags.nogoright = bool(flags0 & (1 << 6))
-    obj.node_properties.flags.nogoleft = bool(flags0 & (1 << 7))
+    obj.fill_group_1 =              bool(flags0 & (1 << 0))
+    obj.fill_group_2 =              bool(flags0 & (1 << 1))
+    obj.fill_group_3 =              bool(flags0 & (1 << 2))
+    obj.offroad =                   bool(flags0 & (1 << 3))
+    obj.unused_4 =                  bool(flags0 & (1 << 4))
+    obj.nobigvehicles =             bool(flags0 & (1 << 5))
+    obj.nogoright =                 bool(flags0 & (1 << 6))
+    obj.nogoleft =                  bool(flags0 & (1 << 7))
 
-    obj.node_properties.flags.slip_lane = bool(flags1 & (1 << 0))
-    obj.node_properties.flags.indicate_keep_left = bool(flags1 & (1 << 1))
-    obj.node_properties.flags.indicate_keep_right = bool(flags1 & (1 << 2))
-    obj.node_properties.flags.special_type = special_types.get(flags1, 'NONE')
+    obj.slip_lane =                 bool(flags1 & (1 << 0))
+    obj.indicate_keep_left =        bool(flags1 & (1 << 1))
+    obj.indicate_keep_right =       bool(flags1 & (1 << 2))
+    obj.special_type =              special_types.get(flags1 & ~((1 << 0) | (1 << 1) | (1 << 2)), 'NONE')
 
-    obj.node_properties.flags.no_gps = bool(flags2 & (1 << 0))
-    obj.node_properties.flags.unused_5 = bool(flags2 & (1 << 1))
-    obj.node_properties.flags.junction = bool(flags2 & (1 << 2))
-    obj.node_properties.flags.unused_6 = bool(flags2 & (1 << 3))
-    obj.node_properties.flags.switched_off_original = bool(flags2 & (1 << 4))
-    obj.node_properties.flags.water_node = bool(flags2 & (1 << 5))
-    obj.node_properties.flags.highway_bridge = bool(flags2 & (1 << 6))
-    obj.node_properties.flags.switched_off = bool(flags2 & (1 << 7))
+    obj.no_gps =                    bool(flags2 & (1 << 0))
+    obj.unused_5 =                  bool(flags2 & (1 << 1))
+    obj.junction =                  bool(flags2 & (1 << 2))
+    obj.unused_6 =                  bool(flags2 & (1 << 3))
+    obj.switched_off_original =     bool(flags2 & (1 << 4))
+    obj.water_node =                bool(flags2 & (1 << 5))
+    obj.highway_bridge =            bool(flags2 & (1 << 6))
+    obj.switched_off =              bool(flags2 & (1 << 7))
 
-    obj.node_properties.flags.tunnel = bool(flags3 & 1)
-    obj.node_properties.flags.heuretic = flags3 // 2
+    obj.tunnel =                    bool(flags3 & (1 << 0))
+    obj.heuretic =                  int((flags3 >> 1) & 127)
 
-    obj.node_properties.flags.density = flags4 & 0xF
-    obj.node_properties.flags.deadness = (flags4 >> 4)
-    obj.node_properties.flags.left_turn_only = bool(flags4 & 128)
+    obj.density =                   int((flags4) & 15)
+    obj.deadness =                  int((flags4 >> 4) & 7)
+    obj.left_turn_only =            bool(flags4 & (1 << 7))
 
-    obj.node_properties.flags.has_junction = bool(flags5 & (1 << 0))
-    obj.node_properties.flags.speed = speed_levels[(flags5 >> 1)]
+    obj.has_junction =              bool(flags5 & (1 << 0))
+    obj.speed =                     speed_levels[flags5 >> 1]
 
 
 def set_link_flags(obj, flags0, flags1, flags2):
-    obj.flags.gps_both_ways = bool(flags0 & (1 << 0))
-    obj.flags.block_if_no_lanes = bool(flags0 & (1 << 1))
-    obj.flags.tilt = flags0 // 4
-    obj.flags.tilt_falloff = flags0 // 32
+    obj.gps_both_ways =             bool(flags0 & (1 << 0))
+    obj.block_if_no_lanes =         bool(flags0 & (1 << 1))
+    obj.tilt =                      int((flags0 >> 2) & 7)
+    obj.tilt_falloff =              int((flags0 >> 5) & 7)
 
-    obj.flags.tilt_falloff_2 = bool(flags1 & (1 << 0))
-    obj.flags.narrow_road = bool(flags1 & (1 << 1))
-    obj.flags.leads_to_dead_end = bool(flags1 & (1 << 2))
-    obj.flags.leads_from_dead_end = bool(flags1 & (1 << 3))
-    obj.flags.negative_offset = bool(flags1 & (1 << 7))
-    obj.flags.width = flags1 // 16
+    obj.tilt_falloff_2 =            bool(flags1 & (1 << 0))
+    obj.narrow_road =               bool(flags1 & (1 << 1))
+    obj.leads_to_dead_end =         bool(flags1 & (1 << 2))
+    obj.leads_from_dead_end =       bool(flags1 & (1 << 3))
+    obj.negative_offset =           bool(flags1 & (1 << 7))
+    obj.offset =                    int(flags1 >> 4 & 7)
 
-    obj.flags.dont_use_for_navigation = bool(flags2 & (1 << 0))
-    obj.flags.shortcut = bool(flags2 & (1 << 1))
-    obj.flags.bwd_lanes = flags2 // 4
-    obj.flags.fwd_lanes = flags2 // 32
+    obj.dont_use_for_navigation =   bool(flags2 & (1 << 0))
+    obj.shortcut =                  bool(flags2 & (1 << 1))
+    obj.bwd_lanes =                 int((flags2 >> 2) & 7)
+    obj.fwd_lanes =                 int((flags2 >> 5) & 7)
+
 
 
 def apply_node_properties(obj, node):
@@ -81,7 +80,7 @@ def apply_node_properties(obj, node):
     obj.node_properties.node_id = node.node_id
     obj.node_properties.streetname = node.streetname
     obj.location = node.position
-    set_node_flags(obj, node.flags_0, node.flags_1, node.flags_2, node.flags_3, node.flags_4, node.flags_5)
+    set_node_flags(obj.node_properties.flags, node.flags_0, node.flags_1, node.flags_2, node.flags_3, node.flags_4, node.flags_5)
     for i, link in enumerate(node.links):
         link_obj = obj.node_properties.links.add()
         apply_link_properties(link_obj, link)
@@ -91,7 +90,7 @@ def apply_node_properties(obj, node):
 def apply_link_properties(obj, link):
     obj.to_area_id = link.to_area_id
     obj.to_node_id = link.to_node_id
-    set_link_flags(obj, link.flags_0, link.flags_1, link.flags_2)
+    set_link_flags(obj.flags, link.flags_0, link.flags_1, link.flags_2)
     obj.length = link.length
     obj.name = f"PathNode {link.to_area_id}.{link.to_node_id}"
     linked_node = find_node(link.to_area_id, link.to_node_id)
