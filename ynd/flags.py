@@ -112,8 +112,8 @@ class LinkFlags(FlagPropertyGroup, bpy.types.PropertyGroup):
         name="Leads From Dead End")
     negative_offset: bpy.props.BoolProperty(
         name="Negative Offset")
-    width: bpy.props.IntProperty(
-        name="Width")
+    offset: bpy.props.IntProperty(
+        name="Offset")
     
     # Flags2
     dont_use_for_navigation: bpy.props.BoolProperty(
