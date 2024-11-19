@@ -24,12 +24,13 @@ class SOLLUMZ_PT_YND_TOOL_PANEL(bpy.types.Panel):
         layout = self.layout
         obj = context.active_object
 
-        if obj:
+        if obj and obj.select_get():
             if obj.sollum_type == SollumType.NODE_DICTIONARY:
                 box = layout.box()
                 box.label(text="Dictionary Properties")
                 box.label(text=f"Veh Nodes: {obj.node_path_properties.vehicle_node_count}")
                 box.label(text=f"Ped Nodes: {obj.node_path_properties.ped_node_count}")
+                layout.operator("sollumz.createnode")
                 
             elif obj.sollum_type == SollumType.TRAFFIC_NODE:
                 box = layout.box()
@@ -39,9 +40,9 @@ class SOLLUMZ_PT_YND_TOOL_PANEL(bpy.types.Panel):
                 box.prop(obj.node_properties, "streetname")
 
             else:
-                layout.label(text="Object needs to be Node or Node Dictionary")
+                layout.operator("sollumz.createnodedict")
         else:
-            layout.label(text="No Node or Junction Selected")
+            layout.operator("sollumz.createnodedict")
 
 
 class YndToolChildPanel:
@@ -83,9 +84,10 @@ class SOLLUMZ_PT_NODE_LINKS_PANEL(YndToolChildPanel, TabbedPanelHelper, bpy.type
         draw_list_with_add_remove(layout, "sollumz.createlink", "sollumz.deletelink",
             SOLLUMZ_UL_LINKS_LIST.bl_idname, "", active_node, "links", active_node, "link_index")
         
-        layout.prop(active_node.links[active_node.link_index], "to_area_id")
-        layout.prop(active_node.links[active_node.link_index], "to_node_id")
-        layout.prop(active_node.links[active_node.link_index], "length")
+        if len(active_node.links) > 0:
+            layout.prop(active_node.links[active_node.link_index], "to_area_id")
+            layout.prop(active_node.links[active_node.link_index], "to_node_id")
+            layout.prop(active_node.links[active_node.link_index], "length")
 
 class NodeLinksChildTabPanel(TabPanel):
     bl_space_type = "VIEW_3D"
@@ -103,7 +105,7 @@ class SOLLUMZ_PT_LINK_FLAGS_PANEL(NodeLinksChildTabPanel, FlagsPanel, bpy.types.
     @classmethod
     def poll(self, context):
         aobj = context.active_object
-        return aobj is not None and aobj.sollum_type == SollumType.TRAFFIC_NODE
+        return aobj is not None and aobj.sollum_type == SollumType.TRAFFIC_NODE and len(aobj.node_properties.links) > 0
 
     def get_flags(self, context):
         active_node = context.active_object.node_properties
