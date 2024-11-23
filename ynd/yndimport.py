@@ -97,6 +97,7 @@ def apply_link_properties(obj, link):
     if linked_node is not None:
         streetname = linked_node.node_properties.streetname
         obj.name = f"{obj.name} {f'({streetname})' if streetname else ''}"
+        obj.linked_obj = linked_node
 
 
 def apply_junctionref_properties(obj, junctionref):

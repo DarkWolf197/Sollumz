@@ -23,6 +23,7 @@ class JunctionRefProperties(bpy.types.PropertyGroup):
 
 class LinkProperties(bpy.types.PropertyGroup):
     name: StringProperty(name="")
+    linked_obj: PointerProperty(type=bpy.types.Object, name="Select Object")
     to_area_id: IntProperty(name="To Area ID")
     to_node_id: IntProperty(name="To Node ID")
     flags: PointerProperty(type=LinkFlags, name="Flags")

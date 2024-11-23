@@ -9,9 +9,6 @@ class UpdateGeonode:
             bpy.context.object.modifiers[link_index]["Socket_3"] += 0.7
     
     def update_material(link, obj, to_obj, geonode):
-        if obj.node_properties.flags.junction or (to_obj and to_obj.node_properties.flags.junction):
-            geonode["Socket_2"] = add_link_material("Magenta Link", (1, 0, 1, 0.5))
-            geonode["Socket_3"] = 3.5
         if obj.node_properties.flags.special_type in ("PED_CROSSING", "PED_ASSISTED", "PED_CROSSING_NOWAIT"):
             geonode["Socket_2"] = add_link_material("Yellow Link", (1, 0.5, 0, 0.5))
             geonode["Socket_3"] = 1.05
@@ -21,6 +18,9 @@ class UpdateGeonode:
         if link.flags.shortcut:
             geonode["Socket_2"] = add_link_material("Cyan Link", (0, 1, 1, 0.5))
             geonode["Socket_3"] = 1.05
+        if obj.node_properties.flags.switched_off or (to_obj and to_obj.node_properties.flags.switched_off):
+            geonode["Socket_2"] = add_link_material("Disabled Link", (1, 1, 1, 0.35))
+            geonode["Socket_3"] = 3.5
         else:
             pass
 

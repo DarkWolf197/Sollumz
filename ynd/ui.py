@@ -31,6 +31,7 @@ class SOLLUMZ_PT_YND_TOOL_PANEL(bpy.types.Panel):
                 box.label(text=f"Veh Nodes: {obj.node_path_properties.vehicle_node_count}")
                 box.label(text=f"Ped Nodes: {obj.node_path_properties.ped_node_count}")
                 layout.operator("sollumz.createnode")
+                layout.operator("sollumz.fixnodeids")
                 
             elif obj.sollum_type == SollumType.TRAFFIC_NODE:
                 box = layout.box()
@@ -85,6 +86,7 @@ class SOLLUMZ_PT_NODE_LINKS_PANEL(YndToolChildPanel, TabbedPanelHelper, bpy.type
             SOLLUMZ_UL_LINKS_LIST.bl_idname, "", active_node, "links", active_node, "link_index")
         
         if len(active_node.links) > 0:
+            layout.prop(active_node.links[active_node.link_index], "linked_obj")
             layout.prop(active_node.links[active_node.link_index], "to_area_id")
             layout.prop(active_node.links[active_node.link_index], "to_node_id")
             layout.prop(active_node.links[active_node.link_index], "length")
