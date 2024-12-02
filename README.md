@@ -21,6 +21,7 @@ See the [wiki](https://github.com/Skylumz/Sollumz/wiki) to get started. Make sur
   * YTYP
   * YNV (Partial)
   * YFT
+  * YND (Partial Showing and Creation)
   
 **Supported Formats (Export)**
   * YDD
@@ -30,6 +31,7 @@ See the [wiki](https://github.com/Skylumz/Sollumz/wiki) to get started. Make sur
   * YMAP
   * YTYP
   * YFT
+  * YND
   
 **General Features**
   * Import / Export
