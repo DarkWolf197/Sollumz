@@ -1,39 +1,19 @@
 import bpy
+from .utils import get_lane_width, get_colour
 
-class UpdateGeonode:
-    def update_narrow(self, context): #TO FIX (Breaks links on import)
-        link_index = context.view_layer.objects.active.node_properties.link_index
-        if self.narrow_road:
-            bpy.context.object.modifiers[link_index]["Socket_3"] -= 0.7
-        else:
-            bpy.context.object.modifiers[link_index]["Socket_3"] += 0.7
+
+def update_material(link, obj, to_obj, geonode):
+    geonode["Socket_2"] = add_link_material(get_colour(link.flags, obj, to_obj))
+    geonode["Socket_3"] = get_lane_width(link.flags, obj, to_obj)
+
+
+def add_link_material(rgba):
+    unique_name = f"LINKMAT_{rgba[0]:.3f}.{rgba[1]:.3f}.{rgba[2]:.3f}.{rgba[3]:.3f}"
     
-    def update_material(link, obj, to_obj, geonode):
-        if obj.node_properties.flags.special_type in ("PED_CROSSING", "PED_ASSISTED", "PED_CROSSING_NOWAIT"):
-            geonode["Socket_2"] = add_link_material("Yellow Link", (1, 0.5, 0, 0.5))
-            geonode["Socket_3"] = 1.05
-        if link.flags.dont_use_for_navigation:
-            geonode["Socket_2"] = add_link_material("Magenta Link", (1, 0, 1, 0.5))
-            geonode["Socket_3"] = 3.5
-        if link.flags.shortcut:
-            geonode["Socket_2"] = add_link_material("Cyan Link", (0, 1, 1, 0.5))
-            geonode["Socket_3"] = 1.05
-        if obj.node_properties.flags.switched_off or (to_obj and to_obj.node_properties.flags.switched_off):
-            geonode["Socket_2"] = add_link_material("Disabled Link", (1, 1, 1, 0.35))
-            geonode["Socket_3"] = 3.5
-        else:
-            pass
-
-
-
-
-
-
-def add_link_material(name, rgba):
-    if name in bpy.data.materials:
-        return bpy.data.materials[name]
+    if unique_name in bpy.data.materials:
+        return bpy.data.materials[unique_name]
     
-    material = bpy.data.materials.new(name=f"{name}")
+    material = bpy.data.materials.new(name=unique_name)
     material.use_nodes = True
 
     nodes = material.node_tree.nodes
@@ -48,18 +28,23 @@ def add_link_material(name, rgba):
     return material
 
 
+def apply_geonode(obj, to_obj):
 
-def apply_geonode(obj, to_obj, link_id):
-    geonode = obj.modifiers.new(name="GeometryNodes", type='NODES')
-    geonode.node_group = bpy.data.node_groups["StreetGeoNode"]
-    geonode.name = f"Link {link_id}"
-    geonode["Socket_1"] = to_obj
-    geonode["Socket_2"] = add_link_material("Green Link", (0, 1, 0, 0.5))
-    geonode["Socket_3"] = 7
+    if to_obj:
+        for mod in to_obj.modifiers:
+            if mod.type == 'NODES' and mod.node_group is not None:
+                if mod.get("Socket_1") == obj:
+                    return
 
-    links = obj.node_properties.links
-    for link in links:
-        UpdateGeonode.update_material(link, obj, to_obj, geonode)
+        geonode = obj.modifiers.new(name="GeometryNodes", type='NODES')
+        geonode.node_group = bpy.data.node_groups["StreetGeoNode"]
+        geonode.name = "Link"
+        geonode["Socket_1"] = to_obj
+
+        links = obj.node_properties.links
+        for link in links:
+            update_material(link, obj, to_obj, geonode)
+
 
 def create_geonode():
     node_group_name = "StreetGeoNode"
@@ -133,7 +118,7 @@ def create_geonode():
         curve_circle_node.inputs[0].default_value = 3
         curve_circle_node.inputs[4].default_value = 0.02
 
-        set_red_material_node.inputs[2].default_value = add_link_material("Red Line", (1, 0, 0, 1))
+        set_red_material_node.inputs[2].default_value = add_link_material((1, 0, 0, 1))
 
         dup_element_node.domain = 'FACE'
 

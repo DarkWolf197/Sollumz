@@ -2,7 +2,6 @@ import bpy
 from bpy.props import (FloatProperty, CollectionProperty, PointerProperty, BoolProperty,
                        StringProperty, IntProperty, FloatVectorProperty)
 from .flags import NodeFlags, LinkFlags
-from .geonode import UpdateGeonode
 
 class JunctionProperties(bpy.types.PropertyGroup):
     position_x: FloatProperty(name="Pos X")
@@ -22,12 +21,13 @@ class JunctionRefProperties(bpy.types.PropertyGroup):
 
 
 class LinkProperties(bpy.types.PropertyGroup):
-    name: StringProperty(name="")
-    linked_obj: PointerProperty(type=bpy.types.Object, name="Select Object")
     to_area_id: IntProperty(name="To Area ID")
     to_node_id: IntProperty(name="To Node ID")
     flags: PointerProperty(type=LinkFlags, name="Flags")
     length: IntProperty(name="Link Lenght")
+
+    name: StringProperty(name="")
+    linked_obj: PointerProperty(type=bpy.types.Object, name="Linked")
 
 
 class NodeProperties(bpy.types.PropertyGroup):

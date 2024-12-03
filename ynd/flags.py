@@ -1,6 +1,5 @@
 import bpy
 from ..sollumz_properties import FlagPropertyGroup
-from .geonode import UpdateGeonode
 
 special_types = [('NONE', "None", ""),
                  ('PARKING', "Parking Space", ""),

@@ -24,8 +24,11 @@ class SOLLUMZ_PT_YND_TOOL_PANEL(bpy.types.Panel):
         layout = self.layout
         obj = context.active_object
 
-        if obj and obj.select_get():
-            if obj.sollum_type == SollumType.NODE_DICTIONARY:
+        if not obj:
+            layout.operator("sollumz.createnodedict")
+
+        else:
+            if obj and obj.sollum_type == SollumType.NODE_DICTIONARY:
                 box = layout.box()
                 box.label(text="Dictionary Properties")
                 box.label(text=f"Veh Nodes: {obj.node_path_properties.vehicle_node_count}")
@@ -42,8 +45,7 @@ class SOLLUMZ_PT_YND_TOOL_PANEL(bpy.types.Panel):
 
             else:
                 layout.operator("sollumz.createnodedict")
-        else:
-            layout.operator("sollumz.createnodedict")
+
 
 
 class YndToolChildPanel:
@@ -86,7 +88,9 @@ class SOLLUMZ_PT_NODE_LINKS_PANEL(YndToolChildPanel, TabbedPanelHelper, bpy.type
             SOLLUMZ_UL_LINKS_LIST.bl_idname, "", active_node, "links", active_node, "link_index")
         
         if len(active_node.links) > 0:
-            layout.prop(active_node.links[active_node.link_index], "linked_obj")
+            row = layout.row(align=True)
+            row.prop(active_node.links[active_node.link_index], "linked_obj")
+            row.operator("sollumz.gotonode", text="", icon="VIEWZOOM")
             layout.prop(active_node.links[active_node.link_index], "to_area_id")
             layout.prop(active_node.links[active_node.link_index], "to_node_id")
             layout.prop(active_node.links[active_node.link_index], "length")

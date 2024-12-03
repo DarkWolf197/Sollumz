@@ -74,47 +74,40 @@ def set_link_flags(obj, flags0, flags1, flags2):
     obj.fwd_lanes =                 int((flags2 >> 5) & 7)
 
 
-
-def apply_node_properties(obj, node):
-    obj.node_properties.area_id = node.area_id
-    obj.node_properties.node_id = node.node_id
-    obj.node_properties.streetname = node.streetname
-    obj.location = node.position
-    set_node_flags(obj.node_properties.flags, node.flags_0, node.flags_1, node.flags_2, node.flags_3, node.flags_4, node.flags_5)
-    for i, link in enumerate(node.links):
-        link_obj = obj.node_properties.links.add()
-        apply_link_properties(link_obj, link)
-        apply_geonode(obj, find_node(link_obj.to_area_id, link_obj.to_node_id), (i + 1))
+def apply_node_properties(node_obj, node):
+    node_obj.node_properties.area_id = node.area_id
+    node_obj.node_properties.node_id = node.node_id
+    node_obj.node_properties.streetname = node.streetname
+    node_obj.location = node.position
+    set_node_flags(node_obj.node_properties.flags, node.flags_0, node.flags_1, node.flags_2, node.flags_3, node.flags_4, node.flags_5)
+    for link in node.links:
+        link_obj = node_obj.node_properties.links.add()
+        apply_link_properties(node_obj, link_obj, link)
 
 
-def apply_link_properties(obj, link):
-    obj.to_area_id = link.to_area_id
-    obj.to_node_id = link.to_node_id
-    set_link_flags(obj.flags, link.flags_0, link.flags_1, link.flags_2)
-    obj.length = link.length
-    obj.name = f"PathNode {link.to_area_id}.{link.to_node_id}"
-    linked_node = find_node(link.to_area_id, link.to_node_id)
-    if linked_node is not None:
-        streetname = linked_node.node_properties.streetname
-        obj.name = f"{obj.name} {f'({streetname})' if streetname else ''}"
-        obj.linked_obj = linked_node
+def apply_link_properties(node_obj, link_obj, link):
+    link_obj.to_area_id = link.to_area_id
+    link_obj.to_node_id = link.to_node_id
+    link_obj.length = link.length
+    link_obj.name = f"PathNode {link.to_area_id}.{link.to_node_id}"
+    set_link_flags(link_obj.flags, link.flags_0, link.flags_1, link.flags_2)
 
 
-def apply_junctionref_properties(obj, junctionref):
-    obj.area_id = junctionref.area_id
-    obj.node_id = junctionref.node_id
-    obj.junction_id = junctionref.junction_id
-    obj.unk_0 = junctionref.unk_0
+def apply_junctionref_properties(junc_obj, junctionref):
+    junc_obj.area_id = junctionref.area_id
+    junc_obj.node_id = junctionref.node_id
+    junc_obj.junction_id = junctionref.junction_id
+    junc_obj.unk_0 = junctionref.unk_0
 
 
-def apply_junction_properties(obj, junction):
-    obj.position_x = junction.position[0]
-    obj.position_y = junction.position[1]
-    obj.min_z = junction.min_z
-    obj.max_z = junction.max_z
-    obj.size_x = junction.size_x
-    obj.size_y = junction.size_y
-    obj.heightmap = junction.heightmap
+def apply_junction_properties(juncref_obj, junction):
+    juncref_obj.position_x = junction.position[0]
+    juncref_obj.position_y = junction.position[1]
+    juncref_obj.min_z = junction.min_z
+    juncref_obj.max_z = junction.max_z
+    juncref_obj.size_x = junction.size_x
+    juncref_obj.size_y = junction.size_y
+    juncref_obj.heightmap = junction.heightmap
 
 
 def node_to_obj(parent_obj: bpy.types.Object, node):
@@ -148,6 +141,16 @@ def add_junction_to_node(junctionref, junction):
             apply_junction_properties(node_obj.node_properties.junction, junction)
 
 
+def apply_link(node_obj, link_obj):
+    to_obj = find_node(link_obj.to_area_id, link_obj.to_node_id)
+
+    link_obj.linked_obj = to_obj
+
+    if to_obj and getattr(to_obj.node_properties, 'streetname', ''):
+        link_obj.name = f"{link_obj.name} ({node_obj.node_properties.streetname})"
+    
+    apply_geonode(node_obj, find_node(link_obj.to_area_id, link_obj.to_node_id))
+
 def ynd_to_obj(ynd, path):
     ynd_obj = bpy.data.objects.new(get_filename(path), None)
     ynd_obj.sollum_type = SollumType.NODE_DICTIONARY
@@ -158,16 +161,22 @@ def ynd_to_obj(ynd, path):
     bpy.context.view_layer.objects.active = ynd_obj
 
     ynd_obj.node_path_properties.vehicle_node_count = ynd.vehicle_node_count
-    ynd_obj.node_path_properties.ped_node_count = ynd.ped_node_count
+    ynd_obj.node_path_properties.ped_node_count = ynd.ped_node_count 
 
     create_geonode()
     for node in ynd.nodes:
         node_to_obj(ynd_obj, node)
-    
+
     junctions = ynd.junctions
     for junctionref in ynd.junctionrefs:
         junction = junctions[junctionref.junction_id]
         add_junction_to_node(junctionref, junction)
+
+
+    for obj in bpy.context.scene.objects:
+        for link in obj.node_properties.links:
+            apply_link(obj, link)
+            
 
     return ynd_obj
 

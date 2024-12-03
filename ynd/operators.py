@@ -6,6 +6,44 @@ from .utils import find_node
 from ..tools.yndhelper import create_nodedict, create_node
 
 
+class SOLLUMZ_OT_goto_node(bpy.types.Operator):
+    """Teleport to a linked node"""
+    bl_idname = "sollumz.gotonode"
+    bl_label = "Go to Linked Node"
+    bl_description = "Navigate to the object linked to the current node"
+    bl_options = {'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        if not context.active_object:
+            return False
+        
+        node_props = getattr(context.active_object, 'node_properties', None)
+        if not node_props:
+            return False
+        
+        link_index = getattr(node_props, 'link_index', -1)
+        links = getattr(node_props, 'links', [])
+        
+        return (0 <= link_index < len(links) and 
+                getattr(links[link_index], 'linked_obj', None) is not None)
+
+    def execute(self, context):
+        obj = context.active_object
+        node_props = obj.node_properties
+        
+        linked_obj = node_props.links[node_props.link_index].linked_obj
+        
+        bpy.ops.object.select_all(action='DESELECT')
+        linked_obj.select_set(True)
+        context.view_layer.objects.active = linked_obj
+        
+        bpy.ops.view3d.view_selected(use_all_regions=True)
+
+        return {'FINISHED'}
+
+
+
 class SOLLUMZ_OT_create_nodedict(SOLLUMZ_OT_base, bpy.types.Operator):
     """Create a sollumz YND object"""
     bl_idname = "sollumz.createnodedict"
@@ -82,6 +120,7 @@ class SOLLUMZ_OT_fix_node_ids(bpy.types.Operator):
 
         return {'FINISHED'}
 
+
 class SOLLUMZ_OT_delete_link(bpy.types.Operator):
     bl_idname = "sollumz.deletelink"
     bl_label = "Delete Link"
@@ -89,39 +128,23 @@ class SOLLUMZ_OT_delete_link(bpy.types.Operator):
     def execute(self, context):
         obj = context.active_object
 
-        # Verifica che l'oggetto abbia le proprietà necessarie
-        if not hasattr(obj, "node_properties") or not hasattr(obj.node_properties, "links"):
-            self.report({'ERROR'}, "Oggetto non ha proprietà di link.")
-            return {'CANCELLED'}
-
-        # Verifica se l'indice è valido
-        link_index = obj.node_properties.link_index
         links = obj.node_properties.links
-
-        if link_index < 0 or link_index >= len(links):
-            self.report({'ERROR'}, "Indice di link non valido.")
-            return {'CANCELLED'}
-
-        # Recupera il link selezionato
+        link_index = obj.node_properties.link_index
         selected_link = links[link_index]
 
-        # Verifica se esiste un oggetto collegato
-        linked_obj = getattr(selected_link, "linked_obj", None)
+        linked_obj = selected_link.linked_obj
 
-        # Rimuovi il link dall'oggetto corrente
-        links.remove(link_index)
-
-        # Rimuovi il link dall'oggetto collegato, se esiste
         if linked_obj and hasattr(linked_obj, "node_properties") and hasattr(linked_obj.node_properties, "links"):
             for i, link in enumerate(linked_obj.node_properties.links):
                 if link.linked_obj == obj:
                     linked_obj.node_properties.links.remove(i)
                     break
+        
+        links.remove(link_index)
 
-        # Report informativo
-        if linked_obj:
-            self.report({'INFO'}, f"Link rimosso tra {obj.name} e {linked_obj.name}.")
+        if len(links) > 0:
+            obj.node_properties.link_index = min(link_index, len(links) - 1)
         else:
-            self.report({'INFO'}, f"Link rimosso dall'oggetto {obj.name}.")
+            obj.node_properties.link_index = -1
 
         return {'FINISHED'}
