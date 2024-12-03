@@ -246,7 +246,7 @@ class SOLLUMZ_OT_export_assets(bpy.types.Operator, TimedOperator):
                     elif obj.sollum_type == SollumType.NODE_DICTIONARY:
                         filepath = self.get_filepath(obj, YND.file_extension)
                         success = export_ynd(obj, filepath)
-                    elif obj.sollum_type in BOUND_TYPES:
+                    elif obj.sollum_type == SollumType.BOUND_COMPOSITE:
                         filepath = self.get_filepath(obj, YBN.file_extension)
                         success = export_ybn(obj, filepath)
                     elif obj.sollum_type == SollumType.YMAP:
