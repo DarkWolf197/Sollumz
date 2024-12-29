@@ -206,8 +206,6 @@ class SOLLUMZ_PT_import_ymap(bpy.types.Panel, SollumzImportSettingsPanel):
         layout.prop(settings, "ymap_box_occluders")
         layout.prop(settings, "ymap_model_occluders")
         layout.prop(settings, "ymap_car_generators")
-        layout.prop(settings, "ymap_import_external_assets")
-        layout.prop(settings, "ymap_external_assets_path")
 
 
 class SOLLUMZ_PT_export_include(bpy.types.Panel, SollumzExportSettingsPanel):

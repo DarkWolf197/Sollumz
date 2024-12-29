@@ -145,6 +145,11 @@ class YmapCarGeneratorProperties(bpy.types.PropertyGroup):
 
 
 def register():
+    bpy.types.Scene.import_external_assets = bpy.props.BoolProperty(
+        name="Import External Assets", description="Import assets needed for the imported ymap from the specified folder", default=False)
+    bpy.types.Scene.external_assets_path = bpy.props.StringProperty(
+        name="Path", description="Folder containing the assets", default="")
+
     bpy.types.Object.ymap_properties = PointerProperty(type=YmapProperties)
     bpy.types.Object.ymap_model_occl_properties = PointerProperty(
         type=YmapModelOccluderProperties)
@@ -153,6 +158,8 @@ def register():
 
 
 def unregister():
+    del bpy.types.Scene.import_external_assets
+    del bpy.types.Scene.external_assets_path
     del bpy.types.Object.ymap_properties
     del bpy.types.Object.ymap_model_occl_properties
     del bpy.types.Object.ymap_cargen_properties

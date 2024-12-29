@@ -170,20 +170,6 @@ class SollumzImportSettings(PropertyGroup):
         update=_save_preferences_on_update
     )
 
-    ymap_import_external_assets: BoolProperty(
-        name="Import External Entities",
-        description="Import assets needed for the imported ymap from the specified folder",
-        default=False,
-        update=_save_preferences_on_update
-    )
-
-    ymap_external_assets_path: StringProperty(
-        name="Path",
-        description="Folder containing the assets",
-        default="",
-        update=_save_preferences_on_update
-    )
-
     ytyp_mlo_instance_entities: BoolProperty(
         name="Instance MLO Entities",
         description=(

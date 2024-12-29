@@ -240,7 +240,12 @@ def ymap_to_obj(ymap: CMapData):
     # TODO: find a way to retrieve ignored stuff on export
     if not import_settings.ymap_exclude_entities and ymap.entities:
         if import_settings.ymap_instance_entities:
-            instanced_entity_to_obj(ymap_obj, ymap)
+            if bpy.context.scene.import_external_assets:
+                file_list = [{"name": f"{entity.archetype_name}.ydr.xml"} for entity in ymap.entities]
+                bpy.ops.sollumz.import_assets(directory=bpy.context.scene.external_assets_path, files=file_list)
+                instanced_entity_to_obj(ymap_obj, ymap)
+            else:
+                instanced_entity_to_obj(ymap_obj, ymap)
         else:
             entity_to_obj(ymap_obj, ymap)
 

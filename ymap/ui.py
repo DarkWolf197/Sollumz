@@ -94,6 +94,8 @@ class SOLLUMZ_PT_YMAP_TOOL_PANEL(bpy.types.Panel):
         layout = self.layout
         row = layout.row()
         row.operator("sollumz.createymap")
+        layout.prop(context.scene, "import_external_assets")
+        layout.prop(context.scene, "external_assets_path")
 
         if (len(bpy.context.selected_objects) > 0):
             active_object = bpy.context.selected_objects[0]
