@@ -37,7 +37,8 @@ class Entity(ElementTree):
         self.position = VectorProperty("position")
         self.rotation = QuaternionProperty("rotation")
         self.scale = VectorProperty("scale")
-        self.lod_dist = ValueProperty("lodDist", 0)
+        self.flags = ValueProperty("flags")
+        self.lod_dist = ValueProperty("lodDist")
         self.lod_level = TextProperty("lodLevel")
 
 

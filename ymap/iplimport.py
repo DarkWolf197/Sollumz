@@ -11,6 +11,9 @@ def apply_entity_properties(obj, entity):
     obj.entity_properties.archetype_name = entity.archetype_name
     obj.entity_properties.lod_dist = entity.lod_dist
     obj.entity_properties.lod_level = "sollumz_" + entity.lod_level.lower()
+    obj.entity_properties.flags = entity.flags
+    if entity.type != "CMloInstanceDef":
+        entity.rotation.invert()
     obj.matrix_world = entity.rotation.to_matrix().to_4x4()
     obj.location = entity.position
     obj.scale = entity.scale
