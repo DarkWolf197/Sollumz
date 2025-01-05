@@ -211,16 +211,6 @@ YMAP_GROUP_TYPES = [
     SollumType.YMAP_CAR_GENERATOR,
 ]
 
-WATER_GROUP_TYPES = [
-    SollumType.WATER_DATA,
-    SollumType.WATER_QUADS,
-    SollumType.CALMING_QUADS,
-    SollumType.WAVE_QUADS,
-    SollumType.WATER_QUAD,
-    SollumType.CALMING_QUAD,
-    SollumType.WAVE_QUAD,
-]
-
 
 SOLLUMZ_UI_NAMES = {
     SollumType.BOUND_BOX: "Bound Box",

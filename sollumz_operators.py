@@ -458,12 +458,12 @@ class ClearTimeFlags(SOLLUMZ_OT_base):
 
 def sollumz_menu_func_import(self, context):
     self.layout.operator(SOLLUMZ_OT_import_assets.bl_idname,
-                         text=f"CodeWalker XML({YDR.file_extension}, {YDD.file_extension}, {YFT.file_extension}, {YBN.file_extension}, {YCD.file_extension}, {WATER.file_extension})")
+                         text=f"CodeWalker XML({YDR.file_extension}, {YDD.file_extension}, {YFT.file_extension}, {YBN.file_extension}, {YCD.file_extension})")
 
 
 def sollumz_menu_func_export(self, context):
     self.layout.operator(SOLLUMZ_OT_export_assets.bl_idname,
-                         text=f"CodeWalker XML({YDR.file_extension}, {YDD.file_extension}, {YFT.file_extension}, {YBN.file_extension}, {YCD.file_extension}, {WATER.file_extension})")
+                         text=f"CodeWalker XML({YDR.file_extension}, {YDD.file_extension}, {YFT.file_extension}, {YBN.file_extension}, {YCD.file_extension})")
 
 
 class SOLLUMZ_OT_debug_hierarchy(bpy.types.Operator):
