@@ -1,4 +1,5 @@
 import bpy
+from ..sollumz_properties import SollumType
 
 class SOLLUMZ_PT_WATER_TOOL_PANEL(bpy.types.Panel):
     bl_label = "Water Quads"
@@ -11,29 +12,36 @@ class SOLLUMZ_PT_WATER_TOOL_PANEL(bpy.types.Panel):
 
     def draw_header(self, context):
         self.layout.label(text="", icon="FCURVE_SNAPSHOT")
-    
+
     def draw(self, context):
         layout = self.layout
-        obj = context.active_object
+        aobj = context.active_object
+        sobj = context.selected_objects[0] if len(context.selected_objects) == 1 else None
 
-        if obj and obj.sollum_type == "sollumz_water_quad":
-            layout.prop(obj.water_quad_properties, "type")
-            layout.prop(obj.water_quad_properties, "invisible")
-            layout.prop(obj.water_quad_properties, "limited_depth")
-            layout.prop(obj.water_quad_properties, "z")
-            layout.prop(obj.water_quad_properties, "a1")
-            layout.prop(obj.water_quad_properties, "a2")
-            layout.prop(obj.water_quad_properties, "a3")
-            layout.prop(obj.water_quad_properties, "a4")
-            layout.prop(obj.water_quad_properties, "no_stencil")
+        row = layout.row(align=True)
+        row.operator("sollumz.createwaterdata")
+        row.operator("sollumz.createwaterquad")
 
-        elif obj and obj.sollum_type == "sollumz_calming_quad":
-            layout.prop(obj.calming_quad_properties, "dampening")
+        if aobj and aobj == sobj and aobj.sollum_type in [SollumType.WATER_QUAD, SollumType.CALMING_QUAD, SollumType.WAVE_QUAD]:
 
-        elif obj and obj.sollum_type == "sollumz_wave_quad":
-            layout.prop(obj.wave_quad_properties, "amplitude")
-            layout.prop(obj.wave_quad_properties, "xdirection")
-            layout.prop(obj.wave_quad_properties, "ydirection")
+            prop_box = layout.box()
+            prop_box.label(text="Water Quad Properties")
 
-        else:
-            layout.label(text="Select a Water Quad")
+            if aobj.sollum_type == SollumType.WATER_QUAD:
+                prop_box.prop(aobj.water_quad_properties, "type")
+                prop_box.prop(aobj.water_quad_properties, "invisible")
+                prop_box.prop(aobj.water_quad_properties, "limited_depth")
+                prop_box.prop(aobj.water_quad_properties, "z")
+                prop_box.prop(aobj.water_quad_properties, "a1")
+                prop_box.prop(aobj.water_quad_properties, "a2")
+                prop_box.prop(aobj.water_quad_properties, "a3")
+                prop_box.prop(aobj.water_quad_properties, "a4")
+                prop_box.prop(aobj.water_quad_properties, "no_stencil")
+
+            elif aobj.sollum_type == SollumType.CALMING_QUAD:
+                prop_box.prop(aobj.calming_quad_properties, "dampening")
+
+            elif aobj.sollum_type == SollumType.WAVE_QUAD:
+                prop_box.prop(aobj.wave_quad_properties, "amplitude")
+                prop_box.prop(aobj.wave_quad_properties, "xdirection")
+                prop_box.prop(aobj.wave_quad_properties, "ydirection")

@@ -231,7 +231,6 @@ class SOLLUMZ_OT_convert_to_collision_material(SOLLUMZ_OT_base, bpy.types.Operat
 
     def run(self, context):
         convert_all = context.scene.convert_all_to_collision_material
-        print(convert_all)
         aobj = context.active_object
         if not aobj:
             self.message("No object selected!")
