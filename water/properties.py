@@ -1,10 +1,10 @@
 import bpy
 
+
 class WaterQuadProperties(bpy.types.PropertyGroup):
     type: bpy.props.IntProperty(name="Type")
     invisible: bpy.props.BoolProperty(name="Is Invisible")
     limited_depth: bpy.props.BoolProperty(name="Has Limited Depth")
-    z: bpy.props.FloatProperty(name="Z")
     a1: bpy.props.IntProperty(name="A1")
     a2: bpy.props.IntProperty(name="A2")
     a3: bpy.props.IntProperty(name="A3")
@@ -18,6 +18,7 @@ class WaveQuadProperties(bpy.types.PropertyGroup):
     amplitude: bpy.props.FloatProperty(name="Amplitude")
     xdirection: bpy.props.FloatProperty(name="X Direction")
     ydirection: bpy.props.FloatProperty(name="Y Direction")
+
 
 def register():
     bpy.types.Object.water_quad_properties = bpy.props.PointerProperty(type=WaterQuadProperties)

@@ -31,7 +31,6 @@ class SOLLUMZ_PT_WATER_TOOL_PANEL(bpy.types.Panel):
                 prop_box.prop(aobj.water_quad_properties, "type")
                 prop_box.prop(aobj.water_quad_properties, "invisible")
                 prop_box.prop(aobj.water_quad_properties, "limited_depth")
-                prop_box.prop(aobj.water_quad_properties, "z")
                 prop_box.prop(aobj.water_quad_properties, "a1")
                 prop_box.prop(aobj.water_quad_properties, "a2")
                 prop_box.prop(aobj.water_quad_properties, "a3")

@@ -7,11 +7,11 @@ from .. import logger
 
 def create_quad_object(quad, type):
 
+    # Avoid Z-Fighing
     height_mapping = {
         SollumType.WATER_QUAD: quad.z,
         SollumType.CALMING_QUAD: -0.01,
-        SollumType.WAVE_QUAD: -0.02,
-    }
+        SollumType.WAVE_QUAD: -0.02}
 
     height = height_mapping.get(type, 0.0)
 
@@ -30,7 +30,6 @@ def create_quad_object(quad, type):
         quad_obj.water_quad_properties.type = quad.type
         quad_obj.water_quad_properties.invisible = quad.invisible
         quad_obj.water_quad_properties.limited_depth = quad.limited_depth
-        quad_obj.water_quad_properties.z = quad.z
         quad_obj.water_quad_properties.a1 = quad.a1
         quad_obj.water_quad_properties.a2 = quad.a2
         quad_obj.water_quad_properties.a3 = quad.a3
