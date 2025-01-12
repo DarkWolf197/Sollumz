@@ -16,7 +16,6 @@ from .cwxml.bound import YBN
 from .cwxml.navmesh import YNV
 from .cwxml.clipdictionary import YCD
 from .cwxml.ytyp import YTYP
-from .cwxml.ipl import IPL
 from .cwxml.ymap import YMAP
 from .cwxml.water import WATER
 from .ydr.ydrimport import import_ydr
@@ -32,7 +31,6 @@ from .ycd.ycdimport import import_ycd
 from .ycd.ycdexport import export_ycd
 from .ymap.ymapimport import import_ymap
 from .ymap.ymapexport import export_ymap
-from .ymap.iplimport import import_ipl
 from .ytyp.ytypimport import import_ytyp
 from .water.waterimport import import_water
 from .water.waterexport import export_water
@@ -75,7 +73,7 @@ class SOLLUMZ_OT_import_assets(bpy.types.Operator, ImportHelper, TimedOperator):
     )
 
     filter_glob: bpy.props.StringProperty(
-        default="".join(f"*{filetype.file_extension};" for filetype in (YDR, YDD, YFT, YBN, YNV, YCD, YMAP, IPL, YTYP, WATER)),
+        default="".join(f"*{filetype.file_extension};" for filetype in (YDR, YDD, YFT, YBN, YNV, YCD, YMAP, YTYP, WATER)),
         options={"HIDDEN", "SKIP_SAVE"},
         maxlen=255,
     )
@@ -114,8 +112,6 @@ class SOLLUMZ_OT_import_assets(bpy.types.Operator, ImportHelper, TimedOperator):
                         import_ycd(filepath)
                     elif YMAP.file_extension in filepath:
                         import_ymap(filepath)
-                    elif IPL.file_extension in filepath:
-                        import_ipl(filepath)
                     elif WATER.file_extension in filepath:
                         import_water(filepath)
                     else:
