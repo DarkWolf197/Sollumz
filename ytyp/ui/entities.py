@@ -112,6 +112,9 @@ class SOLLUMZ_PT_MLO_ENTITY_LIST_PANEL(MloChildTabPanel, bpy.types.Panel):
         list_col.operator("sollumz.setobjentitytransforms",
                           icon="OUTLINER_DATA_EMPTY")
 
+        list_col.operator("sollumz.createfakeentities",
+                          icon="EMPTY_AXIS")
+
         layout.separator()
 
 

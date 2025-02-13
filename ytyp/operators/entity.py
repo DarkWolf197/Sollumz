@@ -169,3 +169,26 @@ class SOLLUMZ_OT_search_entity_rooms(SearchEnumHelper, bpy.types.Operator):
 
     def get_data_block(self, context):
         return get_selected_archetype(context).entities.selection
+
+
+class SOLLUMZ_OT_create_fake_entities(SOLLUMZ_OT_base, bpy.types.Operator):
+    """Create fake entities for the selected mlo archetype"""
+    bl_idname = "sollumz.createfakeentities"
+    bl_label = "Create Fake Entities"
+
+    @classmethod
+    def poll(cls, context):
+        return get_selected_archetype(context) is not None
+
+    def run(self, context):
+        selected_archetype = get_selected_archetype(context)
+        for e in selected_archetype.entities:
+            if e.linked_object is None:
+                fake_entity = bpy.data.objects.new(e.archetype_name, None)
+                fake_entity.location = e.position
+                fake_entity.rotation_euler = e.rotation.to_euler()
+                fake_entity.scale = Vector((e.scale_xy, e.scale_xy, e.scale_z))
+                context.collection.objects.link(fake_entity)
+                e.linked_object = fake_entity
+
+        return True
