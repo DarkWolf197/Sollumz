@@ -293,6 +293,118 @@ class SOLLUMZ_OT_prefs_shared_textures_directory_move_down(Operator):
         return {"FINISHED"}
 
 
+class SzSharedAssetsDirectory(PropertyGroup):
+    path: StringProperty(
+        name="Path",
+        description="Path to a directory with assets",
+        subtype="DIR_PATH",
+        update=_save_preferences_on_update,
+    )
+    recursive: BoolProperty(
+        name="Recursive",
+        description="Search this directory recursively",
+        default=True,
+        update=_save_preferences_on_update,
+    )
+
+
+class SOLLUMZ_UL_prefs_shared_assets_directories(UIList):
+    bl_idname = "SOLLUMZ_UL_prefs_shared_assets_directories"
+
+    def draw_item(
+        self, context, layout, data, item, icon, active_data, active_propname, index
+    ):
+        layout.prop(item, "path", text="", emboss=False)
+        layout.prop(item, "recursive", text="", icon="OUTLINER")
+
+
+class SOLLUMZ_OT_prefs_shared_assets_directory_add(Operator):
+    bl_idname = "sollumz.prefs_shared_assets_directory_add"
+    bl_label = "Add Shared Assets Directory"
+    bl_description = "Add a new directory to search assets in"
+
+    path: StringProperty(
+        name="Path",
+        description="Path to a directory with assets",
+        subtype="DIR_PATH",
+    )
+    recursive: BoolProperty(
+        name="Recursive",
+        description="Search this directory recursively",
+        default=True,
+    )
+
+    def execute(self, context):
+        prefs = get_addon_preferences(context)
+        d = prefs.shared_assets_directories.add()
+        d.path = self.path
+        d.recursive = self.recursive
+        prefs.shared_assets_directories_index = len(prefs.shared_assets_directories) - 1
+        _save_preferences()
+        return {"FINISHED"}
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        return wm.invoke_props_dialog(self)
+
+
+class SOLLUMZ_OT_prefs_shared_assets_directory_remove(Operator):
+    bl_idname = "sollumz.prefs_shared_assets_directory_remove"
+    bl_label = "Remove Shared Assets Directory"
+    bl_description = "Remove the selected directory"
+
+    @classmethod
+    def poll(cls, context):
+        prefs = get_addon_preferences(context)
+        return 0 <= prefs.shared_assets_directories_index < len(prefs.shared_assets_directories)
+
+    def execute(self, context):
+        prefs = get_addon_preferences(context)
+        prefs.shared_assets_directories.remove(prefs.shared_assets_directories_index)
+        context.scene.ytyps.remove(context.scene.ytyp_index)
+        prefs.shared_assets_directories_index = max(prefs.shared_assets_directories_index - 1, 0)
+        _save_preferences()
+        return {"FINISHED"}
+
+
+class SOLLUMZ_OT_prefs_shared_assets_directory_move_up(Operator):
+    bl_idname = "sollumz.prefs_shared_assets_directory_move_up"
+    bl_label = "Increase Shared Asset Directory Priority"
+    bl_description = "Increase search priority of this directory"
+
+    @classmethod
+    def poll(self, context):
+        prefs = get_addon_preferences(context)
+        return 0 < prefs.shared_assets_directories_index < len(prefs.shared_assets_directories)
+
+    def execute(self, context):
+        prefs = get_addon_preferences(context)
+        indexA = prefs.shared_assets_directories_index
+        indexB = prefs.shared_assets_directories_index - 1
+        prefs.swap_shared_assets_directories(indexA, indexB)
+        prefs.shared_assets_directories_index -= 1
+        return {"FINISHED"}
+
+
+class SOLLUMZ_OT_prefs_shared_assets_directory_move_down(Operator):
+    bl_idname = "sollumz.prefs_shared_assets_directory_move_down"
+    bl_label = "Decrease Shared Asset Directory Priority"
+    bl_description = "Decrease search priority of this directory"
+
+    @classmethod
+    def poll(self, context):
+        prefs = get_addon_preferences(context)
+        return 0 <= prefs.shared_assets_directories_index < (len(prefs.shared_assets_directories) - 1)
+
+    def execute(self, context):
+        prefs = get_addon_preferences(context)
+        indexA = prefs.shared_assets_directories_index
+        indexB = prefs.shared_assets_directories_index + 1
+        prefs.swap_shared_assets_directories(indexA, indexB)
+        prefs.shared_assets_directories_index += 1
+        return {"FINISHED"}
+
+
 class SzFavoriteEntry(PropertyGroup):
     name: StringProperty(
         name="Name",
@@ -355,6 +467,15 @@ class SollumzAddonPreferences(AddonPreferences):
         min=0
     )
 
+    shared_assets_directories: CollectionProperty(
+        name="Shared Assets",
+        type=SzSharedAssetsDirectory,
+    )
+    shared_assets_directories_index: IntProperty(
+        name="Selected Shared Textures Directory",
+        min=0
+    )
+
     favorite_shaders: CollectionProperty(
         name="Favorite Shaders",
         type=SzFavoriteEntry,
@@ -370,6 +491,14 @@ class SollumzAddonPreferences(AddonPreferences):
     def swap_shared_textures_directories(self, indexA: int, indexB: int):
         a = self.shared_textures_directories[indexA]
         b = self.shared_textures_directories[indexB]
+        pathA, recA = a.path, a.recursive
+        pathB, recB = b.path, b.recursive
+        a.path, a.recursive = pathB, recB
+        b.path, b.recursive = pathA, recA
+
+    def swap_shared_assets_directories(self, indexA: int, indexB: int):
+        a = self.shared_assets_directories[indexA]
+        b = self.shared_assets_directories[indexB]
         pathA, recA = a.path, a.recursive
         pathB, recB = b.path, b.recursive
         a.path, a.recursive = pathB, recB
@@ -437,10 +566,29 @@ class SollumzAddonPreferences(AddonPreferences):
             self, "shared_textures_directories_index",
             rows=4
         )
+
         side_col.separator()
         subcol = side_col.column(align=True)
         subcol.operator(SOLLUMZ_OT_prefs_shared_textures_directory_move_up.bl_idname, text="", icon="TRIA_UP")
         subcol.operator(SOLLUMZ_OT_prefs_shared_textures_directory_move_down.bl_idname, text="", icon="TRIA_DOWN")
+
+
+        layout.separator()
+        layout.label(text="Shared Assets")
+        _, side_col = draw_list_with_add_remove(
+            self.layout,
+            SOLLUMZ_OT_prefs_shared_assets_directory_add.bl_idname,
+            SOLLUMZ_OT_prefs_shared_assets_directory_remove.bl_idname,
+            SOLLUMZ_UL_prefs_shared_assets_directories.bl_idname, "",
+            self, "shared_assets_directories",
+            self, "shared_assets_directories_index",
+            rows=4
+        )
+
+        side_col.separator()
+        subcol = side_col.column(align=True)
+        subcol.operator(SOLLUMZ_OT_prefs_shared_assets_directory_move_up.bl_idname, text="", icon="TRIA_UP")
+        subcol.operator(SOLLUMZ_OT_prefs_shared_assets_directory_move_down.bl_idname, text="", icon="TRIA_DOWN")
 
         # layout.separator()
         # layout.label(text="Experimental:")

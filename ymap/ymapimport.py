@@ -11,6 +11,9 @@ from ..cwxml.ymap import CMapData, OccludeModel, YMAP
 from ..tools.blenderhelper import create_blender_object, create_empty_object
 from ..tools.meshhelper import create_box
 from .. import logger
+from ..sollumz_preferences import get_addon_preferences
+from pathlib import Path
+from typing import Optional
 
 # TODO: Make better?
 
@@ -78,6 +81,40 @@ def entity_to_obj(ymap_obj: bpy.types.Object, ymap: CMapData):
         return False
 
 
+def find_shared_asset(asset_filename: str) -> Optional[bpy.types.Object]:
+    prefs = get_addon_preferences(bpy.context)
+    file_variants = [f"{asset_filename}.ydr.xml", f"{asset_filename}.yft.xml"]
+
+    for directory in prefs.shared_assets_directories:
+        asset_dir = Path(directory.path)
+        if not asset_dir.exists():
+            continue
+
+        # Find the first matching file
+        found_file = None
+        if directory.recursive:
+            for file in asset_dir.rglob("*"):
+                if file.name in file_variants:
+                    found_file = file
+                    break
+        else:
+            for variant in file_variants:
+                potential_file = asset_dir / variant
+                if potential_file.exists():
+                    found_file = potential_file
+                    break
+
+        # Import the asset if found
+        if found_file:
+            bpy.ops.sollumz.import_assets(
+                directory=str(found_file.parent),
+                files=[{"name": found_file.name}]
+            )
+            return bpy.data.objects[asset_filename]
+
+    return None
+
+
 def instanced_entity_to_obj(ymap_obj: bpy.types.Object, ymap: CMapData):
     group_obj = bpy.data.objects.new("Entities", None)
     group_obj.sollum_type = SollumType.YMAP_ENTITY_GROUP
@@ -95,9 +132,13 @@ def instanced_entity_to_obj(ymap_obj: bpy.types.Object, ymap: CMapData):
         for entity in ymap.entities:
             obj = bpy.data.objects.get(entity.archetype_name, None)
             if obj is None:
-                # No object with the given archetype name found
-                continue
-
+                # No object with the given archetype name found in the scene
+                # Try to find it in shared assets directories
+                obj = find_shared_asset(entity.archetype_name)
+                if not obj:
+                    continue
+                    # Asset not found, skip this entity
+                
             # TODO: requiring ymap entities to be drawable or fragment in blender seems like an unnecessary limitation
             # Need to special case assets because their type when imported by sollumz is drawable model
             if obj.sollum_type == SollumType.DRAWABLE or obj.sollum_type == SollumType.FRAGMENT or obj.asset_data is not None:
