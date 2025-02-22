@@ -22,6 +22,7 @@ from configparser import ConfigParser
 from typing import Optional
 
 PREFS_FILE_NAME = "sollumz_prefs.ini"
+STRINGS_FILE_NAME = "sollumz_strings.ini"
 
 
 def _save_preferences_on_update(self, context):
@@ -178,6 +179,17 @@ class SollumzImportSettings(PropertyGroup):
         ),
         default=True,
         update=_save_preferences_on_update
+    )
+
+
+class SzString(PropertyGroup):
+    string: StringProperty(
+        name="String",
+        default="0",
+    )
+    hash: StringProperty(
+        name="Hashed String",
+        default="0",
     )
 
 
@@ -364,6 +376,11 @@ class SollumzAddonPreferences(AddonPreferences):
         type=SzFavoriteEntry,
     )
 
+    loaded_strings: CollectionProperty(
+        name="Strings",
+        type=SzString
+    )
+
     export_settings: PointerProperty(type=SollumzExportSettings, name="Export Settings")
     import_settings: PointerProperty(type=SollumzImportSettings, name="Import Settings")
 
@@ -424,6 +441,19 @@ class SollumzAddonPreferences(AddonPreferences):
         layout.prop(self, "sollumz_icon_header")
         layout.prop(self, "use_text_name_as_mat_name")
         layout.prop(self, "shader_preset_apply_textures")
+
+        layout.separator()
+        layout.label(text="Strings")
+        box = layout.box()
+        info_row = box.row(align=True)
+        info_row.label(text=f"Loaded Strings: {len(self.loaded_strings)}", icon="FILE_TEXT")
+        button_row = box.row(align=True)
+        button_row.operator("sollumz.import_strings", text="Import", icon="IMPORT")
+        button_row.separator()
+        button_row.operator("sollumz.save_strings", text="Export", icon="EXPORT")
+        button_row.separator()
+        button_row.operator("sollumz.remove_strings", text="Clear", icon="TRASH")
+
 
         from .sollumz_ui import draw_list_with_add_remove
         layout.separator()
@@ -582,6 +612,8 @@ def _update_bpy_struct_from_tuple(struct: bpy_struct, values: tuple | object):
 def get_prefs_path():
     return os.path.join(bpy.utils.user_resource(resource_type="CONFIG"), PREFS_FILE_NAME)
 
+def get_strings_path():
+    return os.path.join(bpy.utils.user_resource(resource_type="CONFIG"), STRINGS_FILE_NAME)
 
 def get_config_directory_path() -> str:
     return bpy.utils.user_resource(resource_type="CONFIG", path="sollumz", create=True)
