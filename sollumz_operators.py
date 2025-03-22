@@ -2,6 +2,7 @@ import traceback
 import os
 from typing import Optional
 import bpy
+import bmesh
 import time
 from collections import defaultdict
 import re
@@ -318,34 +319,124 @@ class SOLLUMZ_OT_paint_vertices(SOLLUMZ_OT_base, bpy.types.Operator):
         size=4
     )
 
-    def paint_map(self, color_attr, color):
-        for datum in color_attr.data:
-            # Uses color_srgb to match the behavior of the old
-            # vertex_colors code. Requires 3.4+.
-            datum.color_srgb = color
+    def paint_map(self, mesh, color):
+        if bpy.context.object.mode == 'EDIT':
+            bm = bmesh.from_edit_mesh(mesh)
+            color_layer = bm.loops.layers.color.active
+            face_mode = bpy.context.scene.face_mode
+            selected_verts = [vert for vert in bm.verts if vert.select]
+
+            if face_mode:
+                selected_faces = [face for face in bm.faces if face.select]
+                if len(selected_faces) == 0:
+                    self.messages.append("Seleziona almeno una faccia quando usi il Face Mode.")
+                    return False
+
+                for face in selected_faces:
+                    for loop in face.loops:
+                        loop[color_layer] = color
+            else:
+                for vert in selected_verts:
+                    for loop in vert.link_loops:
+                        loop[color_layer] = color
+                        
+            bmesh.update_edit_mesh(mesh)
+        else:
+            for datum in mesh.attributes.active_color.data:
+                datum.color_srgb = color
 
     def paint_mesh(self, mesh, color):
         if not mesh.color_attributes:
             mesh.color_attributes.new("Color", 'BYTE_COLOR', 'CORNER')
-        self.paint_map(mesh.attributes.active_color, color)
+        self.paint_map(mesh, color)
 
     def run(self, context):
         objs = context.selected_objects
 
-        if len(objs) > 0:
-            for obj in objs:
-                if obj.sollum_type == SollumType.DRAWABLE_MODEL:
-                    self.paint_mesh(obj.data, self.color)
-                    self.messages.append(
-                        f"{obj.name} was successfully painted.")
-                else:
-                    self.messages.append(
-                        f"{obj.name} will be skipped because it is not a {SOLLUMZ_UI_NAMES[SollumType.DRAWABLE_MODEL]} type.")
-        else:
-            self.message("No objects selected to paint.")
-            return False
+        for obj in objs:
+            if obj.type != 'MESH':
+                self.messages.append(f"{obj.name} sarà saltato perché non è una mesh.")
+                continue
+
+            if obj.sollum_type != SollumType.DRAWABLE_MODEL:
+                self.messages.append(
+                    f"{obj.name} sarà saltato perché non è un {SOLLUMZ_UI_NAMES[SollumType.DRAWABLE_MODEL]}."
+                )
+                continue
+
+            self.paint_mesh(obj.data, self.color)
+            self.messages.append(f"{obj.name} è stato dipinto con successo.")
 
         return True
+
+
+
+class SOLLUMZ_OT_copy_vertex_color(SOLLUMZ_OT_base, bpy.types.Operator):
+    """Copy Selected Vertex Color"""
+    bl_idname = "sollumz.copy_vertex_color"
+    bl_label = "Copy"
+    bl_action = "Copy Vertex Color"
+
+    idx: bpy.props.IntProperty(
+        min=1,
+        max=6
+    )
+
+    @classmethod
+    def poll(cls, context):
+        obj = context.object
+        if obj:
+            mesh = obj.data
+            bm = bmesh.from_edit_mesh(mesh) if obj.mode == 'EDIT' else None
+            if bm:
+                selected_verts = [v for v in bm.verts if v.select]
+
+        return (obj and obj.mode == 'EDIT' and 
+                mesh.color_attributes.active_color_index > -1 and 
+                bool(selected_verts))
+
+    def run(self, context):
+        obj = context.object
+        mesh = obj.data
+        color_layer = mesh.color_attributes.active_color_index
+        
+        bm = bmesh.from_edit_mesh(mesh)
+        color_layer_bm = bm.loops.layers.color[color_layer]
+        selected_verts = [v for v in bm.verts if v.select]
+
+        for face in bm.faces:
+            for loop in face.loops:
+                if loop.vert == selected_verts[0]:
+                    color = loop[color_layer_bm]
+                    break
+        
+        setattr(context.scene, f'vert_paint_color{self.idx}', color)
+
+        return True
+
+
+class SOLLUMZ_OT_reset_vertex_colors(SOLLUMZ_OT_base, bpy.types.Operator):
+    """Reset Vertex Colors"""
+    bl_idname = "sollumz.reset_vertex_colors"
+    bl_label = "Reset"
+    bl_action = "Reset Vertex Color"
+    
+    def execute(self, context):
+        default_colors = {
+            "vert_paint_color1": (1.0, 1.0, 1.0, 1.0),
+            "vert_paint_color2": (0.0, 0.0, 1.0, 1.0),
+            "vert_paint_color3": (0.0, 1.0, 0.0, 1.0),
+            "vert_paint_color4": (1.0, 0.0, 0.0, 1.0),
+            "vert_paint_color5": (1.0, 0.501961, 0.0, 1.0),
+            "vert_paint_color6": (0.0, 0.0, 0.0, 0.0),
+        }
+        
+        for prop_name, default_value in default_colors.items():
+            setattr(context.scene, prop_name, default_value)
+        
+        self.report({'INFO'}, "Color properties have been reset to default values")
+        
+        return {'FINISHED'}
 
 
 class SOLLUMZ_OT_paint_terrain_tex1(SOLLUMZ_OT_base, bpy.types.Operator):

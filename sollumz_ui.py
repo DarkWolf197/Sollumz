@@ -416,16 +416,19 @@ class SOLLUMZ_PT_VERTEX_TOOL_PANEL(GeneralToolChildPanel, bpy.types.Panel):
         row.prop(context.scene, "vert_paint_color1", text="")
         row.operator(
             "sollumz.paint_vertices").color = context.scene.vert_paint_color1
+        row.operator("sollumz.copy_vertex_color", text="", icon="EYEDROPPER").idx = 1
 
         row2 = layout.row()
         row2.prop(context.scene, "vert_paint_color2", text="")
         row2.operator(
             "sollumz.paint_vertices").color = context.scene.vert_paint_color2
+        row2.operator("sollumz.copy_vertex_color", text="", icon="EYEDROPPER").idx = 2
 
         row3 = layout.row()
         row3.prop(context.scene, "vert_paint_color3", text="")
         row3.operator(
             "sollumz.paint_vertices").color = context.scene.vert_paint_color3
+        row3.operator("sollumz.copy_vertex_color", text="", icon="EYEDROPPER").idx = 3
 
         preferences = get_addon_preferences(bpy.context)
         extra = preferences.extra_color_swatches
@@ -434,16 +437,23 @@ class SOLLUMZ_PT_VERTEX_TOOL_PANEL(GeneralToolChildPanel, bpy.types.Panel):
             row4.prop(context.scene, "vert_paint_color4", text="")
             row4.operator(
                 "sollumz.paint_vertices").color = context.scene.vert_paint_color4
+            row4.operator("sollumz.copy_vertex_color", text="", icon="EYEDROPPER").idx = 4
 
             row5 = layout.row()
             row5.prop(context.scene, "vert_paint_color5", text="")
             row5.operator(
                 "sollumz.paint_vertices").color = context.scene.vert_paint_color5
+            row5.operator("sollumz.copy_vertex_color", text="", icon="EYEDROPPER").idx = 5
 
             row6 = layout.row()
             row6.prop(context.scene, "vert_paint_color6", text="")
             row6.operator(
                 "sollumz.paint_vertices").color = context.scene.vert_paint_color6
+            row6.operator("sollumz.copy_vertex_color", text="", icon="EYEDROPPER").idx = 6
+        
+        row = layout.row()
+        row.prop(context.scene, "face_mode")
+        row.operator("sollumz.reset_vertex_colors", text="", icon="LOOP_BACK")
 
 
 class SOLLUMZ_PT_SET_SOLLUM_TYPE_PANEL(GeneralToolChildPanel, bpy.types.Panel):

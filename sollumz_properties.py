@@ -535,6 +535,9 @@ def register():
     bpy.types.Scene.vert_paint_alpha = bpy.props.FloatProperty(
         name="Alpha", min=-1, max=1)
 
+    bpy.types.Scene.face_mode = bpy.props.BoolProperty(
+        name="Face Mode", description="Paints only the selected face", default=False)
+
     bpy.types.Scene.debug_sollum_type = bpy.props.EnumProperty(
         items=[(SollumType.DRAWABLE.value, SOLLUMZ_UI_NAMES[SollumType.DRAWABLE], SOLLUMZ_UI_NAMES[SollumType.DRAWABLE]),
                (SollumType.DRAWABLE_DICTIONARY.value,
@@ -567,6 +570,7 @@ def unregister():
     del bpy.types.Material.sollum_type
     del bpy.types.Object.entity_properties
     del bpy.types.Scene.vert_paint_alpha
+    del bpy.types.Scene.face_mode
     del bpy.types.Scene.debug_sollum_type
     del bpy.types.Scene.all_sollum_type
     del bpy.types.Scene.debug_lights_only_selected
