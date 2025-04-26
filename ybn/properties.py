@@ -459,6 +459,7 @@ def register():
     )
 
     bpy.app.handlers.load_post.append(on_blend_file_loaded)
+    refresh_ui_collections()
 
 
 def unregister():
