@@ -1,7 +1,7 @@
 import bpy
 from typing import Optional
 from .sollumz_preferences import get_addon_preferences, get_export_settings, get_import_settings, SollumzImportSettings, SollumzExportSettings
-from .sollumz_operators import SOLLUMZ_OT_copy_location, SOLLUMZ_OT_copy_rotation, SOLLUMZ_OT_paste_location, SOLLUMZ_OT_paste_rotation
+from .sollumz_operators import SOLLUMZ_OT_copy_location, SOLLUMZ_OT_copy_rotation, SOLLUMZ_OT_paste_location, SOLLUMZ_OT_paste_rotation, SOLLUMZ_OT_refresh_shaders
 from .tools.blenderhelper import get_armature_obj
 from .sollumz_properties import (
     SollumType,
@@ -277,6 +277,8 @@ class SOLLUMZ_PT_TOOL_PANEL(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
+        layout.operator(SOLLUMZ_OT_refresh_shaders.bl_idname, icon="MATERIAL")
+        
         row = layout.row()
         row.operator("sollumz.import_assets")
 

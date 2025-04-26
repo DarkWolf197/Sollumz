@@ -919,6 +919,19 @@ class SOLLUMZ_OT_set_sollum_type(bpy.types.Operator):
             {"INFO"}, f"Sollum Type successfuly set to {SOLLUMZ_UI_NAMES[sollum_type]}.")
 
         return {"FINISHED"}
+    
+
+class SOLLUMZ_OT_refresh_shaders(bpy.types.Operator):
+    """Refresh all shaders"""
+    bl_idname = "sollumz.refreshshaders"
+    bl_label = "Refresh Shaders"
+
+    def execute(self, context):
+
+        print("SOCKS")
+
+        return {"FINISHED"}
+
 
 
 class SearchEnumHelper:
