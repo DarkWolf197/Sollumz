@@ -240,9 +240,19 @@ class SOLLUMZ_OT_convert_to_collision_material(SOLLUMZ_OT_base, bpy.types.Operat
             self.message("No material selected!")
             return False
 
+        if context.scene.convert_all_to_collision_material:
+            meshes = [obj for obj in bpy.data.meshes]
+            for mesh in meshes:
+                for i, slot in enumerate(mesh.materials):
+                    if slot == active_mat:
+                        mat = create_collision_material_from_index(context.window_manager.sz_collision_material_index)
+                        mesh.materials[i] = mat
+            return True
+
         mat = create_collision_material_from_index(context.window_manager.sz_collision_material_index)
         active_mat_index = aobj.active_material_index
         aobj.data.materials[active_mat_index] = mat
+        return True
 
 
 class SOLLUMZ_OT_delete_flag_preset(SOLLUMZ_OT_base, bpy.types.Operator):
