@@ -204,6 +204,29 @@ def get_detail_extra_sampler(mat):  # move to blenderhelper.py?
 
 
 def create_tinted_shader_graph(obj: bpy.types.Object):
+    attribute_to_remove = []
+    modifiers_to_remove = []
+
+    for mod in obj.modifiers:
+        if mod.type == "NODES":
+            for mat in obj.data.materials:
+                tint_node = get_tint_sampler_node(mat)
+                if tint_node is not None:
+                    output_id = mod.node_group.interface.items_tree.get("Tint Color")
+                    if output_id:
+                        attr_name = mod[output_id.identifier + "_attribute_name"]
+                        if attr_name and attr_name in obj.data.attributes:
+                            attribute_to_remove.append(attr_name)
+
+                    modifiers_to_remove.append(mod)
+                    break
+
+    for attr_name in attribute_to_remove:
+        obj.data.attributes.remove(obj.data.attributes[attr_name])
+
+    for mod in modifiers_to_remove:
+        obj.modifiers.remove(mod)
+
     tint_mats = get_tinted_mats(obj)
 
     if not tint_mats:
@@ -871,19 +894,21 @@ def create_water_nodes(b: ShaderBuilder):
     bsdf = b.bsdf
     output = b.material_output
 
-    bsdf.inputs["Base Color"].default_value = (0.316, 0.686, 0.801, 1.0)
+    bsdf.inputs["Base Color"].default_value = (0.602416, 0.894181, 1.0, 1.0)
     bsdf.inputs["Roughness"].default_value = 0.0
     bsdf.inputs["IOR"].default_value = 1.444
-    bsdf.inputs["Alpha"].default_value = 0.750
-    bsdf.inputs["Transmission Weight"].default_value = 0.750
+    bsdf.inputs["Transmission Weight"].default_value = 1.0
 
     nm = node_tree.nodes.new("ShaderNodeNormalMap")
-    nm.inputs["Strength"].default_value = 0.5
+    nm.inputs["Strength"].default_value = 0.2
     noise = node_tree.nodes.new("ShaderNodeTexNoise")
-    noise.inputs["Scale"].default_value = 8.0
-    noise.inputs["Detail"].default_value = 2.0
+    noise.inputs["Scale"].default_value = 5.0
+    noise.inputs["Detail"].default_value = 3.0
     noise.inputs["Roughness"].default_value = 2.0
+    layer_weight = node_tree.nodes.new("ShaderNodeLayerWeight")
+    layer_weight.inputs["Blend"].default_value = 0.94
 
+    links.new(layer_weight.outputs["Fresnel"], bsdf.inputs["Alpha"])
     links.new(noise.outputs["Color"], nm.inputs["Color"])
     links.new(nm.outputs["Normal"], bsdf.inputs["Normal"])
     links.new(bsdf.outputs["BSDF"], output.inputs["Surface"])

@@ -496,6 +496,10 @@ class SelectTimeFlagsRange(SOLLUMZ_OT_base):
 
     def run(self, context):
         flags = self.get_flags(context)
+        return SelectTimeFlagsRange._process_one(flags, context)
+
+    @staticmethod
+    def _process_one(flags, context) -> bool:
         if not flags:
             return False
         start = int(flags.time_flags_start)
@@ -516,6 +520,21 @@ class SelectTimeFlagsRange(SOLLUMZ_OT_base):
         return True
 
 
+class SelectTimeFlagsRangeMultiSelect(SOLLUMZ_OT_base):
+    """Select range of time flags"""
+    bl_label = "Select"
+
+    def iter_selection_flags(self, context):
+        if False: # empty generator
+            yield
+
+    def run(self, context):
+        for flags in self.iter_selection_flags(context):
+            if not SelectTimeFlagsRange._process_one(flags, context):
+                return False
+        return True
+
+
 class ClearTimeFlags(SOLLUMZ_OT_base):
     """Clear all time flags"""
     bl_label = "Clear Selection"
@@ -525,11 +544,30 @@ class ClearTimeFlags(SOLLUMZ_OT_base):
 
     def run(self, context):
         flags = self.get_flags(context)
+        return ClearTimeFlags._process_one(flags, context)
+
+    @staticmethod
+    def _process_one(flags, context) -> bool:
         if not flags:
             return False
         for prop in TimeFlagsMixin.flag_names:
             flags[prop] = False
         flags.update_flag(context)
+        return True
+
+
+class ClearTimeFlagsMultiSelect(SOLLUMZ_OT_base):
+    """Clear all time flags"""
+    bl_label = "Clear Selection"
+
+    def iter_selection_flags(self, context):
+        if False: # empty generator
+            yield
+
+    def run(self, context):
+        for flags in self.iter_selection_flags(context):
+            if not ClearTimeFlags._process_one(flags, context):
+                return False
         return True
 
 
@@ -589,7 +627,7 @@ class SOLLUMZ_OT_debug_hierarchy(bpy.types.Operator):
         for bound in obj.children:
             if bound.type == "EMPTY":
                 if "cloth" in bound.name.lower():
-                    bound.sollum_type = SollumType.BOUND_CLOTH
+                    bound.sollum_type = SollumType.BOUND_PLANE
                     continue
 
                 if "bvh" in bound.name.lower():
