@@ -2,7 +2,7 @@ import bpy
 
 from ..tools.utils import int_to_bool_list, flag_prop_to_list, flag_list_to_int
 from bpy.props import (EnumProperty, FloatProperty, PointerProperty,
-                       StringProperty, IntProperty, FloatVectorProperty, BoolProperty)
+                       StringProperty, IntProperty, FloatVectorProperty, BoolProperty, CollectionProperty)
 
 
 def update_uint_prop(self, context, var_name):
@@ -95,6 +95,8 @@ class YmapBlockProperties(bpy.types.PropertyGroup):
     owner: StringProperty(name="Owner")
     time: StringProperty(name="Time")
 
+class PhysicDict(bpy.types.PropertyGroup):
+    name: bpy.props.StringProperty(name="Name", default="")
 
 class YmapProperties(bpy.types.PropertyGroup):
     parent: StringProperty(name="Parent", default="")
@@ -102,7 +104,7 @@ class YmapProperties(bpy.types.PropertyGroup):
                        update=FlagPropertyGroup.update_flags_total)
     content_flags: IntProperty(name="Content Flags", default=0, min=0, max=(
         2**11)-1, update=ContentFlagPropertyGroup.update_flags_total)
-
+    phyiscs_dict: CollectionProperty(name="Physics Dictionary", type=PhysicDict)
     streaming_extents_min: FloatVectorProperty(name="Streaming Extents Min", default=(0, 0, 0), size=3, subtype='XYZ')
     streaming_extents_max: FloatVectorProperty(name="Streaming Extents Max", default=(0, 0, 0), size=3, subtype='XYZ')
     entities_extents_min: FloatVectorProperty(name="Entities Extents Min", default=(0, 0, 0), size=3, subtype='XYZ')
@@ -143,6 +145,24 @@ class YmapCarGeneratorProperties(bpy.types.PropertyGroup):
     body_color_remap_4: IntProperty(name="BodyColorRemap4", default=-1)
     livery: IntProperty(name="Livery", default=-1)
 
+class YmapGrassBatchProperties(bpy.types.PropertyGroup):
+    batch_aabb_min: FloatVectorProperty(
+        name="Batch AABB Min", default=(0, 0, 0, 0), size=4, subtype='QUATERNION')
+    batch_aabb_max: FloatVectorProperty(
+        name="Batch AABB Max", default=(0, 0, 0, 0), size=4, subtype='QUATERNION')
+    scale_range: FloatVectorProperty(
+        name="Scale Range", default=(0.0, 0.0, 0.0), size=3, subtype='XYZ')
+    lod_dist: IntProperty(name="LOD Distance")
+    lod_fade_start_dist: FloatProperty(name="LOD Fade Start Distance")
+    lod_inst_fade_range: FloatProperty(name="LOD Instance Fade Range")
+    orient_to_terrain: BoolProperty(name="Orient to Terrain")
+
+class YmapGrassInstProperties(bpy.types.PropertyGroup):
+    color: StringProperty(name="Color")
+    scale: IntProperty(name="Scale", default=255)
+    ao: IntProperty(name="Ao", default=255)
+    pad: StringProperty(name="Pad")
+
 
 def register():
     bpy.types.Object.ymap_properties = PointerProperty(type=YmapProperties)
@@ -150,6 +170,10 @@ def register():
         type=YmapModelOccluderProperties)
     bpy.types.Object.ymap_cargen_properties = PointerProperty(
         type=YmapCarGeneratorProperties)
+    bpy.types.Object.ymap_grass_batch_properties = PointerProperty(
+        type=YmapGrassBatchProperties)
+    bpy.types.Object.ymap_grass_inst_properties = PointerProperty(
+        type=YmapGrassInstProperties)
 
 
 def unregister():

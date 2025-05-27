@@ -58,6 +58,10 @@ class SollumType(str, Enum):
     YMAP_MODEL_OCCLUDER = "sollumz_ymap_model_occluder"
     YMAP_CAR_GENERATOR = "sollumz_ymap_car_generator"
 
+    GRASS_GROUP = "sollumz_grass_group"
+    GRASS_BATCH = "sollumz_grass_batch"
+    GRASS_INSTANCE = "sollumz_grass_instance"
+
     CHARACTER_CLOTH_MESH = "sollumz_character_cloth_mesh"
 
 
@@ -264,6 +268,10 @@ SOLLUMZ_UI_NAMES = {
     SollumType.YMAP_MODEL_OCCLUDER: "Model Occluder",
     SollumType.YMAP_CAR_GENERATOR: "Car Generator",
 
+    SollumType.GRASS_GROUP: "Grass Group",
+    SollumType.GRASS_BATCH: "Grass Batch",
+    SollumType.GRASS_INSTANCE: "Grass Instance",
+
     MaterialType.NONE: "None",
     MaterialType.SHADER: "Sollumz Material",
     MaterialType.COLLISION: "Sollumz Collision Material",
@@ -435,7 +443,7 @@ class TimeFlagsMixin(FlagPropertyGroup):
 class EntityProperties:
     archetype_name: bpy.props.StringProperty(name="Archetype Name")
     flags: bpy.props.IntProperty(name="Flags", default=32)
-    guid: bpy.props.FloatProperty(name="GUID")
+    guid: bpy.props.IntProperty(name="GUID")
     parent_index: bpy.props.IntProperty(name="Parent Index", default=-1)
     lod_dist: bpy.props.FloatProperty(name="Lod Distance", default=200)
     child_lod_dist: bpy.props.FloatProperty(name="Child Lod Distance")

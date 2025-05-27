@@ -78,6 +78,29 @@ def draw_ymap_car_generator_properties(self, context):
         layout.prop(obj.ymap_cargen_properties, 'livery')
 
 
+def draw_ymap_grass_batch_properties(self, context):
+    obj = context.active_object
+    if obj and obj.sollum_type == SollumType.GRASS_BATCH:
+        layout = self.layout
+        layout.separator()
+        layout.prop(obj.ymap_grass_batch_properties, "scale_range")
+        layout.prop(obj.ymap_grass_batch_properties, "lod_dist")
+        layout.prop(obj.ymap_grass_batch_properties, "lod_fade_start_dist")
+        layout.prop(obj.ymap_grass_batch_properties, "lod_inst_fade_range")
+        layout.prop(obj.ymap_grass_batch_properties, "orient_to_terrain")
+
+def draw_ymap_grass_inst_properties(self, context):
+    obj = context.active_object
+    if obj and obj.sollum_type == SollumType.GRASS_INSTANCE:
+        layout = self.layout
+        layout.separator()
+        layout.prop(obj.ymap_grass_inst_properties, "color")
+        layout.prop(obj.ymap_grass_inst_properties, "scale")
+        layout.prop(obj.ymap_grass_inst_properties, "ao")
+        layout.prop(obj.ymap_grass_inst_properties, "pad")
+
+
+
 class SOLLUMZ_PT_YMAP_TOOL_PANEL(bpy.types.Panel):
     bl_label = "Map Data"
     bl_idname = "SOLLUMZ_PT_YMAP_TOOL_PANEL"
@@ -149,13 +172,20 @@ class OBJECT_PT_ymap_block(bpy.types.Panel):
             layout.prop(obj.ymap_properties.block, "time")
 
 
+
 def register():
     SOLLUMZ_PT_OBJECT_PANEL.append(draw_ymap_properties)
     SOLLUMZ_PT_OBJECT_PANEL.append(draw_ymap_model_occluder_properties)
     SOLLUMZ_PT_OBJECT_PANEL.append(draw_ymap_car_generator_properties)
+    SOLLUMZ_PT_OBJECT_PANEL.append(draw_ymap_grass_batch_properties)
+    SOLLUMZ_PT_OBJECT_PANEL.append(draw_ymap_grass_inst_properties)
+
 
 
 def unregister():
     SOLLUMZ_PT_OBJECT_PANEL.remove(draw_ymap_properties)
     SOLLUMZ_PT_OBJECT_PANEL.remove(draw_ymap_model_occluder_properties)
     SOLLUMZ_PT_OBJECT_PANEL.remove(draw_ymap_car_generator_properties)
+    SOLLUMZ_PT_OBJECT_PANEL.remove(draw_ymap_grass_batch_properties)
+    SOLLUMZ_PT_OBJECT_PANEL.remove(draw_ymap_grass_inst_properties)
+

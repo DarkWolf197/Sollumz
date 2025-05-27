@@ -132,6 +132,56 @@ def calculate_cargen_orient(obj):
 
     return 5 * math.sin(angle), 5 * math.cos(angle)
 
+def quantize_position(real_pos, bounds_min, bounds_max):
+    def quantize(val, min_val, max_val):
+        # Evita divisioni per zero
+        if max_val == min_val:
+            return 0
+        norm = (val - min_val) / (max_val - min_val)
+        return max(0, min(65535, int(round(norm * 65535))))
+
+    qx = quantize(real_pos.x, bounds_min.x, bounds_max.x)
+    qy = quantize(real_pos.y, bounds_min.y, bounds_max.y)
+    qz = quantize(real_pos.z, bounds_min.z, bounds_max.z)
+
+    return f"{qx} {qy} {qz}"
+
+
+def encode_normal(x, y, z):
+    length = math.sqrt(x * x + y * y + z * z)
+    if length == 0:
+        x, y, z = 0.0, 0.0, 1.0
+
+    # Step 2: Ricodifica X e Y in valori interi 0-255
+    normal_x = int(round(((x + 1.0) / 2.0) * 255))
+    normal_y = int(round(((y + 1.0) / 2.0) * 255))
+
+    # Clamp per sicurezza
+    normal_x = max(0, min(255, normal_x))
+    normal_y = max(0, min(255, normal_y))
+    
+    return normal_x, normal_y
+
+import mathutils
+
+def get_batch_extents(batch_obj):
+    bbox_min = mathutils.Vector((float('inf'), float('inf'), float('inf')))
+    bbox_max = mathutils.Vector((float('-inf'), float('-inf'), float('-inf')))
+
+    for child in batch_obj.children:
+        world_bbox = [child.matrix_world @ mathutils.Vector(corner) for corner in child.bound_box]
+
+        for v in world_bbox:
+            bbox_min.x = min(bbox_min.x, v.x - 0.4)
+            bbox_min.y = min(bbox_min.y, v.y - 0.4)
+            bbox_min.z = min(bbox_min.z, v.z - 0.4)
+
+            bbox_max.x = max(bbox_max.x, v.x + 0.4)
+            bbox_max.y = max(bbox_max.y, v.y + 0.4)
+            bbox_max.z = max(bbox_max.z, v.z + 0.4)
+
+    return bbox_min, bbox_max
+
 
 def ymap_from_object(obj):
     ymap = CMapData()
@@ -178,9 +228,57 @@ def ymap_from_object(obj):
                     logger.warning(
                         f"Object {model_obj.name} will be skipped because it is not a {SOLLUMZ_UI_NAMES[SollumType.YMAP_MODEL_OCCLUDER]} type.")
 
-        # TODO: physics_dictionaries
 
-        # TODO: time cycle
+        for physic_dict in obj.ymap_properties.phyiscs_dict:
+            for physic_obj in child.children:
+                    physic = PhysicsDictionariesList.PhysicsDictionarie()
+                    physic.value = physic_dict.name
+                    ymap.physics_dictionaries.append(physic)
+
+
+        if child.sollum_type == SollumType.GRASS_GROUP:
+            instanced_data = InstancedDataProperty()
+
+            batches = []
+            for batch in child.children:
+                bbox_min, bbox_max = get_batch_extents(batch)
+
+                instances = []
+                for grass_obj in batch.children:
+                    norm_x, norm_y = encode_normal(
+                        grass_obj.rotation_euler.x,
+                        grass_obj.rotation_euler.y,
+                        grass_obj.rotation_euler.z
+                    )
+                    grass_instance = GrassInstance()
+                    grass_instance.position = quantize_position(
+                        grass_obj.location,
+                        bbox_min, bbox_max
+                    )
+                    grass_instance.normal_x = norm_x
+                    grass_instance.normal_y = norm_y
+                    grass_instance.color = grass_obj.ymap_grass_inst_properties.color
+                    grass_instance.scale = grass_obj.ymap_grass_inst_properties.scale
+                    grass_instance.ao = grass_obj.ymap_grass_inst_properties.ao
+                    grass_instance.pad = grass_obj.ymap_grass_inst_properties.pad
+                    instances.append(grass_instance)
+
+                bbox = BatchAABB()
+                bbox.min=Vector((bbox_min.x, bbox_min.y, bbox_min.z, 0))
+                bbox.max=Vector((bbox_max.x, bbox_max.y, bbox_max.z, 0))
+                
+                batch_instance = GrassInstanceBatch()
+                batch_instance.batch_aabb = bbox
+                batch_instance.scale_range = batch.ymap_grass_batch_properties.scale_range
+                batch_instance.archetype_name = batch.name
+                batch_instance.lod_dist = batch.ymap_grass_batch_properties.lod_dist
+                batch_instance.lod_fade_start_dist = batch.ymap_grass_batch_properties.lod_fade_start_dist
+                batch_instance.lod_inst_fade_range = batch.ymap_grass_batch_properties.lod_inst_fade_range
+                batch_instance.orient_to_terrain = batch.ymap_grass_batch_properties.orient_to_terrain
+                batch_instance.instance_list = instances
+                batches.append(batch_instance)
+            instanced_data.grass_instance_list = batches
+
 
         # Car generators
         if export_settings.ymap_car_generators == False and child.sollum_type == SollumType.YMAP_CAR_GENERATOR_GROUP:
@@ -204,6 +302,7 @@ def ymap_from_object(obj):
     ymap.parent = obj.ymap_properties.parent
     ymap.flags = obj.ymap_properties.flags
     ymap.content_flags = obj.ymap_properties.content_flags
+    ymap.instanced_data = instanced_data if 'instanced_data' in locals() else None
 
     generate_ymap_extents(obj)
     ymap.entities_extents_min = obj.ymap_properties.entities_extents_min
@@ -212,7 +311,7 @@ def ymap_from_object(obj):
     ymap.streaming_extents_max = obj.ymap_properties.streaming_extents_max
 
     ymap.block.version = obj.ymap_properties.block.version
-    ymap.block.versiflagson = obj.ymap_properties.block.flags
+    ymap.block.flags = obj.ymap_properties.block.flags
     ymap.block.name = obj.ymap_properties.block.name
     ymap.block.exported_by = obj.ymap_properties.block.exported_by
     ymap.block.owner = obj.ymap_properties.block.owner

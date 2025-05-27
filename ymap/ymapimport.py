@@ -2,7 +2,7 @@ import math
 import bpy
 import numpy as np
 from numpy.typing import NDArray
-from mathutils import Vector, Euler
+from mathutils import Vector, Euler, Color
 from ..sollumz_helper import duplicate_object_with_children, set_object_collection
 from ..tools.ymaphelper import add_occluder_material, get_cargen_mesh
 from ..sollumz_properties import SollumType
@@ -216,6 +216,25 @@ def cargen_to_obj(obj: bpy.types.Object, ymap: CMapData):
         cargen_obj.parent = group_obj
 
 
+def decode_normal(normal_x, normal_y):
+    x = (normal_x / 255.0) * 2.0 - 1.0
+    y = (normal_y / 255.0) * 2.0 - 1.0
+    z = math.sqrt(max(0.0, 1.0 - x * x - y * y))
+    return Vector((round(x, 4), round(y, 4), round(z, 4)))
+
+def dequantize_position(quantized_xyz, bbaa):
+    qx, qy, qz = map(int, quantized_xyz.split())
+
+    nx = qx / 65535.0
+    ny = qy / 65535.0
+    nz = qz / 65535.0
+
+    real_x = bbaa.min.x + nx * (bbaa.max.x - bbaa.min.x)
+    real_y = bbaa.min.y + ny * (bbaa.max.y - bbaa.min.y)
+    real_z = bbaa.min.z + nz * (bbaa.max.z - bbaa.min.z)
+
+    return Vector((real_x, real_y, real_z))
+
 def ymap_to_obj(ymap: CMapData):
     ymap_obj = bpy.data.objects.new(ymap.name, None)
     ymap_obj.sollum_type = SollumType.YMAP
@@ -252,7 +271,11 @@ def ymap_to_obj(ymap: CMapData):
     if import_settings.ymap_model_occluders == False and len(ymap.occlude_models) > 0:
         model_to_obj(ymap_obj, ymap)
 
-    # TODO: physics_dictionaries
+    
+    for physic_dict in ymap.physics_dictionaries:
+        dict = ymap_obj.ymap_properties.phyiscs_dict.add()
+        dict.name = physic_dict.value
+
 
     # TODO: time cycle
 
@@ -262,7 +285,34 @@ def ymap_to_obj(ymap: CMapData):
 
     # TODO: lod ligths
 
-    # TODO: distant lod lights
+
+    def grass_batch_to_obj(obj, grass):
+        grass_obj = create_empty_object(SollumType.GRASS_BATCH)
+        grass_obj.parent = obj
+        grass_obj.name = grass.archetype_name
+        grass_obj.ymap_grass_batch_properties.scale_range = grass.scale_range
+        grass_obj.ymap_grass_batch_properties.lod_dist = grass.lod_dist
+        grass_obj.ymap_grass_batch_properties.lod_fade_start_dist = grass.lod_fade_start_dist
+        grass_obj.ymap_grass_batch_properties.lod_inst_fade_range = grass.lod_inst_fade_range
+        grass_obj.ymap_grass_batch_properties.orient_to_terrain = grass.orient_to_terrain
+        for instance in grass.instance_list:
+            inst_obj = create_empty_object(SollumType.GRASS_INSTANCE)
+            inst_obj.parent = grass_obj
+            inst_obj.location = dequantize_position(instance.position, grass.batch_aabb)
+            inst_obj.rotation_euler = decode_normal(instance.normal_x, instance.normal_y)
+            inst_obj.ymap_grass_inst_properties.color = str(instance.color)
+            inst_obj.ymap_grass_inst_properties.scale = instance.scale
+            inst_obj.ymap_grass_inst_properties.ao = instance.ao
+            inst_obj.ymap_grass_inst_properties.pad = str(instance.pad)
+
+        return grass_obj
+
+    instanced_data = ymap.instanced_data
+    if len(instanced_data.grass_instance_list) > 0:
+        grass_group_obj = create_empty_object(SollumType.GRASS_GROUP)
+        grass_group_obj.parent = ymap_obj
+        for batch in instanced_data.grass_instance_list:
+            grass_batch_to_obj(grass_group_obj, batch)
 
     ymap_obj.ymap_properties.block.version = str(ymap.block.version)
     ymap_obj.ymap_properties.block.flags = str(ymap.block.flags)
