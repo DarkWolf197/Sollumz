@@ -58,6 +58,9 @@ class SollumType(str, Enum):
     YMAP_MODEL_OCCLUDER = "sollumz_ymap_model_occluder"
     YMAP_CAR_GENERATOR = "sollumz_ymap_car_generator"
 
+    NODE_DICTIONARY = "sollumz_node_dictionary"
+    NODE = "sollumz_node"
+
     CHARACTER_CLOTH_MESH = "sollumz_character_cloth_mesh"
 
 
@@ -263,6 +266,9 @@ SOLLUMZ_UI_NAMES = {
     SollumType.YMAP_BOX_OCCLUDER: "Box Occluder",
     SollumType.YMAP_MODEL_OCCLUDER: "Model Occluder",
     SollumType.YMAP_CAR_GENERATOR: "Car Generator",
+
+    SollumType.NODE_DICTIONARY: "Node Dictionary",
+    SollumType.NODE: "Node",
 
     MaterialType.NONE: "None",
     MaterialType.SHADER: "Sollumz Material",
