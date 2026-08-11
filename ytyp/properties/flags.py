@@ -97,8 +97,8 @@ class EntityFlags(FlagPropertyGroup, bpy.types.PropertyGroup):
         name="Unused", update=FlagPropertyGroup.update_flag)
     flag18: bpy.props.BoolProperty(
         name="Does Not Touch Water", update=FlagPropertyGroup.update_flag)
-    flag19: bpy.props.BoolProperty(name="Does Not Spawn Peds",
-                                   update=FlagPropertyGroup.update_flag)
+    flag19: bpy.props.BoolProperty(
+        name="Does Not Spawn Peds", update=FlagPropertyGroup.update_flag)
     flag20: bpy.props.BoolProperty(
         name="Cast Static Shadows", update=FlagPropertyGroup.update_flag)
     flag21: bpy.props.BoolProperty(
